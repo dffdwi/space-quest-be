@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { CreateUserDto } from './user.contract';
-import { UserResponseDto } from './user.contract';
 import { User } from './user.entity';
 
 @Injectable()
@@ -15,27 +14,23 @@ export class UserService {
     private readonly userModel: typeof User,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
+  async create(createUserDto: CreateUserDto): Promise<User> {
     const existingUser = await this.findOneByEmail(createUserDto.email);
     if (existingUser) {
       throw new ConflictException('Email sudah terdaftar');
     }
     const user = await this.userModel.create({ ...createUserDto });
-    return new UserResponseDto({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-    });
+    return user;
   }
 
-  async findOneByEmail(email: string): Promise<User | undefined> {
+  async findOneByEmail(email: string): Promise<User | null> {
     return this.userModel.findOne({ where: { email } });
   }
 
-  async findById(id: number): Promise<User | undefined> {
-    const user = await this.userModel.findByPk(id);
+  async findById(userId: string): Promise<User> {
+    const user = await this.userModel.findByPk(userId);
     if (!user) {
-      throw new NotFoundException(`User dengan ID ${id} tidak ditemukan`);
+      throw new NotFoundException(`User dengan ID ${userId} tidak ditemukan`);
     }
     return user;
   }

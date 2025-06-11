@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthResponseDto } from './auth.contract';
 import { JwtPayload } from './strategies/jwt.strategy';
@@ -26,21 +26,25 @@ export class AuthService {
   async login(userPayload: AuthenticatedUserPayload): Promise<AuthResponseDto> {
     const jwtTokenPayload: JwtPayload = {
       email: userPayload.email,
-      sub: userPayload.id,
+      sub: userPayload.userId,
     };
     const accessToken = this.jwtService.sign(jwtTokenPayload);
 
+    const user = await this.userService.findById(userPayload.userId);
+    if (!user) {
+      throw new NotFoundException(
+        `User dengan ID ${userPayload.userId} tidak ditemukan`,
+      );
+    }
+
     return {
       accessToken,
-      user: new UserResponseDto({
-        id: userPayload.id,
-        email: userPayload.email,
-        name: userPayload.name,
-      }),
+      user: new UserResponseDto(user),
     };
   }
 
   async register(createUserDto: CreateUserDto): Promise<UserResponseDto> {
-    return this.userService.create(createUserDto);
+    const createdUser = await this.userService.create(createUserDto);
+    return new UserResponseDto(createdUser);
   }
 }
