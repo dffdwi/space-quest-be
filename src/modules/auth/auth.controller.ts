@@ -7,7 +7,7 @@ import {
   Get,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
+import { LoginDto } from './auth.contract';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import {
@@ -17,9 +17,9 @@ import {
   ApiBody,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { AuthResponseDto } from './dto/auth.response.dto';
-import { CreateUserDto } from '../user/dto/create-user.dto';
-import { UserResponseDto } from '../user/dto/user.response.dto';
+import { AuthResponseDto } from './auth.contract';
+import { CreateUserDto } from '../user/user.contract';
+import { UserResponseDto } from '../user/user.contract';
 import { User } from '../user/user.entity';
 import { AuthenticatedUserPayload } from './strategies/local.strategy';
 

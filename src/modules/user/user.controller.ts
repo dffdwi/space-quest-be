@@ -8,16 +8,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from './user.contract';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { UserResponseDto } from './dto/user.response.dto';
-// Import JwtAuthGuard jika sudah dibuat di AuthModule
-// import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UserResponseDto } from './user.contract';
 
 @ApiTags('Users')
 @Controller('users')
