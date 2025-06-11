@@ -7,6 +7,7 @@ import pg from 'pg';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { GameConfigModule } from './modules/game-config/game-config.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { JwtModule } from '@nestjs/jwt';
     }),
     UserModule,
     AuthModule,
+    GameConfigModule,
   ],
   controllers: [AppController],
   providers: [AppService],
