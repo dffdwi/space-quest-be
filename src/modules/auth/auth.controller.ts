@@ -20,13 +20,16 @@ import {
 import { AuthResponseDto } from './auth.contract';
 import { CreateUserDto } from '../user/user.contract';
 import { UserResponseDto } from '../user/user.contract';
-import { User } from '../user/user.entity';
 import { AuthenticatedUserPayload } from './strategies/local.strategy';
+import { UserService } from '../user/user.service';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
 
   @Post('register')
   @ApiOperation({ summary: 'Registrasi user baru' })
@@ -69,9 +72,10 @@ export class AuthController {
     type: UserResponseDto,
   })
   @ApiResponse({ status: 401, description: 'Tidak terotorisasi.' })
-  getProfile(
+  async getProfile(
     @Request() req: { user: AuthenticatedUserPayload },
-  ): UserResponseDto {
-    return new UserResponseDto(req.user);
+  ): Promise<UserResponseDto> {
+    const user = await this.userService.findById(req.user.userId);
+    return new UserResponseDto(user);
   }
 }

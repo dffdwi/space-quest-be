@@ -4,7 +4,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../auth.service';
 
 export type AuthenticatedUserPayload = {
-  id: number;
+  userId: string;
   email: string;
   name?: string;
 };
@@ -24,7 +24,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('Email atau password salah.');
     }
     return {
-      id: user.id,
+      userId: user.userId,
       email: user.email,
       name: user.name,
     };
