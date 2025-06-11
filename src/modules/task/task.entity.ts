@@ -10,6 +10,7 @@ import {
   AllowNull,
 } from 'sequelize-typescript';
 import { User } from '../user/user.entity';
+import { Project } from '../project/project.entity';
 
 @Table({
   tableName: 'tasks',
@@ -30,6 +31,14 @@ export class Task extends Model<Task> {
 
   @BelongsTo(() => User)
   user!: User;
+
+  @ForeignKey(() => Project)
+  @AllowNull(true)
+  @Column(DataType.UUID)
+  projectId?: string;
+
+  @BelongsTo(() => Project)
+  project?: Project;
 
   @Column(DataType.STRING)
   title!: string;

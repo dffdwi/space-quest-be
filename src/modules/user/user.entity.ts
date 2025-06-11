@@ -6,8 +6,13 @@ import {
   BeforeCreate,
   PrimaryKey,
   Default,
+  HasMany,
+  BelongsToMany,
 } from 'sequelize-typescript';
 import * as bcrypt from 'bcrypt';
+import { Task } from '../task/task.entity';
+import { Project } from '../project/project.entity';
+import { ProjectMember } from '../project/project_member.entity';
 
 @Table({
   tableName: 'users',
@@ -16,10 +21,7 @@ import * as bcrypt from 'bcrypt';
 export class User extends Model<User> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
-  @Column({
-    type: DataType.UUID,
-    field: 'userId',
-  })
+  @Column(DataType.UUID)
   userId!: string;
 
   @Column(DataType.STRING)
@@ -91,6 +93,12 @@ export class User extends Model<User> {
     field: 'last_discovery_date',
   })
   lastDiscoveryDate?: Date;
+
+  @HasMany(() => Task)
+  tasks!: Task[];
+
+  @BelongsToMany(() => Project, () => ProjectMember)
+  projects!: Project[];
 
   @BeforeCreate
   static async hashPassword(instance: User) {

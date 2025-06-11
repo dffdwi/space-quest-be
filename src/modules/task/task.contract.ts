@@ -111,3 +111,13 @@ export class TaskResponseDto {
     this.completedAt = task.completedAt;
   }
 }
+
+export class MoveTaskDto {
+  @ApiProperty({
+    description: 'ID status atau kolom tujuan yang baru',
+    example: 'inprogress',
+  })
+  @IsString()
+  @IsNotEmpty()
+  newStatus!: string;
+}
