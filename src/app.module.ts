@@ -8,6 +8,7 @@ import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { GameConfigModule } from './modules/game-config/game-config.module';
+import { TaskModule } from './modules/task/task.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { GameConfigModule } from './modules/game-config/game-config.module';
     UserModule,
     AuthModule,
     GameConfigModule,
+    TaskModule,
   ],
   controllers: [AppController],
   providers: [AppService],
