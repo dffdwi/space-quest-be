@@ -65,4 +65,11 @@ export class TaskService {
     await task.update(updatePayload);
     return task;
   }
+  async move(taskId: string, userId: string, newStatus: string): Promise<Task> {
+    const task = await this.findById(taskId, userId);
+
+    task.status = newStatus;
+    await task.save();
+    return task;
+  }
 }

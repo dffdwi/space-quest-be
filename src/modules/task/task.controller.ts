@@ -17,7 +17,12 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { TaskService } from './task.service';
-import { CreateTaskDto, TaskResponseDto, UpdateTaskDto } from './task.contract';
+import {
+  CreateTaskDto,
+  MoveTaskDto,
+  TaskResponseDto,
+  UpdateTaskDto,
+} from './task.contract';
 import { AuthenticatedUserPayload } from '../auth/strategies/local.strategy';
 
 @ApiTags('Tasks')
@@ -60,5 +65,21 @@ export class TaskController {
       updateTaskDto,
     );
     return new TaskResponseDto(updatedTask);
+  }
+
+  @Put(':taskId/move')
+  @ApiOperation({ summary: 'Memindahkan tugas ke kolom Kanban lain' })
+  @ApiResponse({ status: 200, type: TaskResponseDto })
+  async moveTask(
+    @Request() req: { user: AuthenticatedUserPayload },
+    @Param('taskId', new ParseUUIDPipe()) taskId: string,
+    @Body() moveTaskDto: MoveTaskDto,
+  ) {
+    const movedTask = await this.taskService.move(
+      taskId,
+      req.user.userId,
+      moveTaskDto.newStatus,
+    );
+    return new TaskResponseDto(movedTask);
   }
 }
