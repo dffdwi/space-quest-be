@@ -1,14 +1,19 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Task } from './task.entity';
 import { CreateTaskDto, UpdateTaskDto } from './task.contract';
-import { User } from '../user/user.entity';
+import { GameLogicService, GameEventResult } from '../game/game-logic.service';
 
 @Injectable()
 export class TaskService {
   constructor(
     @InjectModel(Task)
     private readonly taskModel: typeof Task,
+    private readonly gameLogicService: GameLogicService,
   ) {}
 
   async findAllForUser(userId: string): Promise<Task[]> {
@@ -32,18 +37,11 @@ export class TaskService {
 
   async create(userId: string, createTaskDto: CreateTaskDto): Promise<Task> {
     const { dueDate, ...rest } = createTaskDto;
-
-    const taskPayload: any = {
-      ...rest,
-      userId,
-    };
-
+    const taskPayload: any = { ...rest, userId };
     if (dueDate) {
       taskPayload.dueDate = new Date(dueDate);
     }
-
-    const task = await this.taskModel.create(taskPayload);
-    return task;
+    return this.taskModel.create(taskPayload);
   }
 
   async update(
@@ -52,24 +50,45 @@ export class TaskService {
     updateTaskDto: UpdateTaskDto,
   ): Promise<Task> {
     const task = await this.findById(taskId, userId);
-
     const { dueDate, ...rest } = updateTaskDto;
     const updatePayload: any = { ...rest };
-
     if (dueDate) {
       updatePayload.dueDate = new Date(dueDate);
     } else if (updateTaskDto.hasOwnProperty('dueDate')) {
       updatePayload.dueDate = null;
     }
-
     await task.update(updatePayload);
     return task;
   }
+
   async move(taskId: string, userId: string, newStatus: string): Promise<Task> {
     const task = await this.findById(taskId, userId);
-
     task.status = newStatus;
     await task.save();
     return task;
+  }
+
+  async complete(
+    taskId: string,
+    userId: string,
+  ): Promise<{ task: Task; eventResult: GameEventResult }> {
+    const task = await this.findById(taskId, userId);
+
+    if (task.completed) {
+      throw new BadRequestException('Tugas ini sudah diselesaikan.');
+    }
+
+    task.completed = true;
+    task.completedAt = new Date();
+    task.status = 'done';
+    await task.save();
+
+    const eventResult = await this.gameLogicService.processTaskCompletion(
+      userId,
+      task.xp,
+      task.credits,
+    );
+
+    return { task, eventResult };
   }
 }

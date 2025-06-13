@@ -5,7 +5,10 @@ import {
   DataType,
   PrimaryKey,
   Default,
+  BelongsToMany,
 } from 'sequelize-typescript';
+import { User } from '../user/user.entity';
+import { PlayerBadge } from './player_badge.entity';
 
 @Table({
   tableName: 'badges',
@@ -28,4 +31,7 @@ export class Badge extends Model<Badge> {
 
   @Column(DataType.STRING)
   color!: string;
+
+  @BelongsToMany(() => User, () => PlayerBadge)
+  users!: User[];
 }

@@ -13,6 +13,12 @@ import * as bcrypt from 'bcrypt';
 import { Task } from '../task/task.entity';
 import { Project } from '../project/project.entity';
 import { ProjectMember } from '../project/project_member.entity';
+import { Mission } from '../mission/mission.entity';
+import { PlayerMission } from '../mission/player_mission.entity';
+import { Badge } from '../badge/badge.entity';
+import { PlayerBadge } from '../badge/player_badge.entity';
+import { ShopItem } from '../shop/shop_item.entity';
+import { PlayerInventory } from '../shop/player_inventory.entity';
 
 @Table({
   tableName: 'users',
@@ -99,6 +105,15 @@ export class User extends Model<User> {
 
   @BelongsToMany(() => Project, () => ProjectMember)
   projects!: Project[];
+
+  @BelongsToMany(() => Mission, () => PlayerMission)
+  missions!: Mission[];
+
+  @BelongsToMany(() => Badge, () => PlayerBadge)
+  badges!: Badge[];
+
+  @HasMany(() => PlayerInventory)
+  inventory!: PlayerInventory[];
 
   @BeforeCreate
   static async hashPassword(instance: User) {
