@@ -15,6 +15,7 @@ import { BadgeModule } from './modules/badge/badge.module';
 import { MissionModule } from './modules/mission/mission.module';
 import { ShopModule } from './modules/shop/shop.module';
 import { DailyModule } from './modules/daily/daily.module';
+import { LeaderboardModule } from './modules/leaderboard/leaderboard.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { DailyModule } from './modules/daily/daily.module';
     MissionModule,
     ShopModule,
     DailyModule,
+    LeaderboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
