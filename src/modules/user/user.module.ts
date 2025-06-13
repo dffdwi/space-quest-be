@@ -8,6 +8,7 @@ import { ProjectModule } from '../project/project.module';
 import { MissionModule } from '../mission/mission.module';
 import { BadgeModule } from '../badge/badge.module';
 import { ShopModule } from '../shop/shop.module';
+import { DailyModule } from '../daily/daily.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ShopModule } from '../shop/shop.module';
     forwardRef(() => MissionModule),
     forwardRef(() => BadgeModule),
     forwardRef(() => ShopModule),
+    forwardRef(() => DailyModule),
   ],
   controllers: [UserController],
   providers: [UserService],

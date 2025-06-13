@@ -14,6 +14,7 @@ import { GameModule } from './modules/game/game.module';
 import { BadgeModule } from './modules/badge/badge.module';
 import { MissionModule } from './modules/mission/mission.module';
 import { ShopModule } from './modules/shop/shop.module';
+import { DailyModule } from './modules/daily/daily.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { ShopModule } from './modules/shop/shop.module';
     BadgeModule,
     MissionModule,
     ShopModule,
+    DailyModule,
   ],
   controllers: [AppController],
   providers: [AppService],
