@@ -7,8 +7,12 @@ import {
   Default,
   ForeignKey,
   BelongsTo,
+  BelongsToMany,
+  HasMany,
 } from 'sequelize-typescript';
 import { Badge } from '../badge/badge.entity';
+import { User } from '../user/user.entity';
+import { PlayerMission } from './player_mission.entity';
 
 @Table({
   tableName: 'missions',
@@ -49,4 +53,10 @@ export class Mission extends Model<Mission> {
 
   @BelongsTo(() => Badge)
   rewardBadge?: Badge;
+
+  @BelongsToMany(() => User, () => PlayerMission)
+  players!: User[];
+
+  @HasMany(() => PlayerMission)
+  playerMissions!: PlayerMission[];
 }

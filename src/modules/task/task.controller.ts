@@ -82,4 +82,24 @@ export class TaskController {
     );
     return new TaskResponseDto(movedTask);
   }
+
+  @Post(':taskId/complete')
+  @ApiOperation({ summary: 'Menyelesaikan sebuah tugas' })
+  @ApiResponse({
+    status: 200,
+    description: 'Tugas berhasil diselesaikan, mengembalikan hasil event game.',
+  })
+  async completeTask(
+    @Request() req: { user: AuthenticatedUserPayload },
+    @Param('taskId', new ParseUUIDPipe()) taskId: string,
+  ) {
+    const { task, eventResult } = await this.taskService.complete(
+      taskId,
+      req.user.userId,
+    );
+    return {
+      task: new TaskResponseDto(task),
+      eventResult,
+    };
+  }
 }

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Project } from './project.entity';
 import { ProjectColumn } from './project_column.entity';
@@ -10,7 +10,7 @@ import { UserModule } from '../user/user.module';
 @Module({
   imports: [
     SequelizeModule.forFeature([Project, ProjectColumn, ProjectMember]),
-    UserModule,
+    forwardRef(() => UserModule),
   ],
   providers: [ProjectService],
   controllers: [ProjectController],

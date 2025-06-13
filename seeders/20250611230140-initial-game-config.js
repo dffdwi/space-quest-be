@@ -1,22 +1,26 @@
 'use strict';
+
 const { v4: uuidv4 } = require('uuid');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    const badgeFirstContact = uuidv4();
-    const badgeExplorerInitiate = uuidv4();
-    const badgeDiligentCommander = uuidv4();
-    const badgeGalacticWorkhorse = uuidv4();
-    const badgeLevel5Cadet = uuidv4();
-    const badgeSeasonedCaptain = uuidv4();
-    const badgeDedicatedNavigator = uuidv4();
-    const badgeProjectInitiator = uuidv4();
-    const badgeStarMarketPatron = uuidv4();
+    const badgeIds = {
+      FIRST_CONTACT: 'c8f9af97-bef2-4a0d-8962-91711370a9df',
+      EXPLORER_INITIATE: 'aff831c5-37f1-47cd-be47-0c38cc4c6893',
+      DILIGENT_COMMANDER: '5b6e40ce-1d8a-4b2f-a525-6a3b7966be38',
+      LEVEL_5_CADET: '9bca3149-b4c6-457b-8d17-41299dbf1a63',
+    };
+
+    const missionIds = {
+      COMPLETE_1_TASK: '1af9bca1-7493-4676-b56d-88f28c01608e',
+      COMPLETE_5_TASKS: '138af36a-8954-47a4-a171-d6e6b812b8d2',
+      REACH_LEVEL_5: '8eea9fb6-ddf2-4d4b-9a4b-b501ab89c243',
+    };
 
     await queryInterface.bulkInsert('badges', [
       {
-        badgeId: badgeFirstContact,
+        badgeId: badgeIds.FIRST_CONTACT,
         name: 'First Contact',
         description: 'Complete your first mission log.',
         icon: 'FaRegLightbulb',
@@ -25,7 +29,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        badgeId: badgeExplorerInitiate,
+        badgeId: badgeIds.EXPLORER_INITIATE,
         name: 'Explorer Initiate',
         description: 'Complete 5 mission logs.',
         icon: 'FaSpaceShuttle',
@@ -34,7 +38,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        badgeId: badgeDiligentCommander,
+        badgeId: badgeIds.DILIGENT_COMMANDER,
         name: 'Diligent Commander',
         description: 'Complete 20 mission logs.',
         icon: 'FaUserAstronaut',
@@ -43,16 +47,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        badgeId: badgeGalacticWorkhorse,
-        name: 'Galactic Workhorse',
-        description: 'Complete 100 mission logs.',
-        icon: 'FaMedal',
-        color: 'text-orange-400',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        badgeId: badgeLevel5Cadet,
+        badgeId: badgeIds.LEVEL_5_CADET,
         name: 'Cadet Level 5',
         description: 'Reach Command Level 5.',
         icon: 'FaGraduationCap',
@@ -60,103 +55,42 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-      {
-        badgeId: badgeSeasonedCaptain,
-        name: 'Seasoned Captain',
-        description: 'Reach Command Level 10.',
-        icon: 'FaShieldAlt',
-        color: 'text-green-400',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        badgeId: badgeDedicatedNavigator,
-        name: 'Dedicated Navigator (7 Days)',
-        description: 'Log in 7 days in a row.',
-        icon: 'FaCalendarCheck',
-        color: 'text-teal-400',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        badgeId: badgeProjectInitiator,
-        name: 'Expedition Planner',
-        description: 'Create your first Crew Expedition.',
-        icon: 'FaUsersCog',
-        color: 'text-rose-400',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        badgeId: badgeStarMarketPatron,
-        name: 'Star Market Patron',
-        description: 'Make your first purchase at the Star Market.',
-        icon: 'FaStore',
-        color: 'text-amber-500',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
     ]);
 
     await queryInterface.bulkInsert('missions', [
       {
-        missionId: uuidv4(),
-        title: 'Daily Patrol',
-        description: 'Clear at least one personal objective today.',
-        type: 'daily',
-        target: 1,
-        rewardXp: 15,
-        rewardCredits: 5,
-        rewardBadgeId: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        missionId: uuidv4(),
-        title: 'Weekly Sector Scan',
-        description:
-          'Complete 7 personal objectives this week to map the area.',
-        type: 'weekly',
-        target: 7,
-        rewardXp: 150,
-        rewardCredits: 50,
-        rewardBadgeId: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        missionId: uuidv4(),
+        missionId: missionIds.COMPLETE_1_TASK,
         title: 'The First Step',
         description: 'Complete your very first objective.',
         type: 'once',
         target: 1,
         rewardXp: 25,
         rewardCredits: 10,
-        rewardBadgeId: badgeFirstContact,
+        rewardBadgeId: badgeIds.FIRST_CONTACT,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        missionId: uuidv4(),
+        missionId: missionIds.COMPLETE_5_TASKS,
         title: 'Getting the Hang of It',
         description: 'Complete a total of 5 objectives.',
         type: 'once',
         target: 5,
         rewardXp: 50,
         rewardCredits: 20,
-        rewardBadgeId: badgeExplorerInitiate,
+        rewardBadgeId: badgeIds.EXPLORER_INITIATE,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        missionId: uuidv4(),
+        missionId: missionIds.REACH_LEVEL_5,
         title: 'A Commander in the Making',
         description: 'Reach Level 5 and prove your capabilities.',
         type: 'once',
         target: 5,
         rewardXp: 200,
         rewardCredits: 100,
-        rewardBadgeId: badgeLevel5Cadet,
+        rewardBadgeId: badgeIds.LEVEL_5_CADET,
         createdAt: new Date(),
         updatedAt: new Date(),
       },

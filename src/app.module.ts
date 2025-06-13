@@ -10,6 +10,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { GameConfigModule } from './modules/game-config/game-config.module';
 import { TaskModule } from './modules/task/task.module';
 import { ProjectModule } from './modules/project/project.module';
+import { GameModule } from './modules/game/game.module';
+import { BadgeModule } from './modules/badge/badge.module';
+import { MissionModule } from './modules/mission/mission.module';
+import { ShopModule } from './modules/shop/shop.module';
 
 @Module({
   imports: [
@@ -42,6 +46,10 @@ import { ProjectModule } from './modules/project/project.module';
     GameConfigModule,
     TaskModule,
     ProjectModule,
+    GameModule,
+    BadgeModule,
+    MissionModule,
+    ShopModule,
   ],
   controllers: [AppController],
   providers: [AppService],

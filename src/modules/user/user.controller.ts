@@ -22,7 +22,6 @@ import { UserResponseDto } from './user.contract';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // Endpoint ini bisa dipindahkan ke AuthController sebagai /auth/register
   @Post()
   @ApiOperation({ summary: 'Membuat user baru (registrasi)' })
   @ApiResponse({
