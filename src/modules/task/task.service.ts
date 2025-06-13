@@ -82,7 +82,6 @@ export class TaskService {
     task.completedAt = new Date();
     task.status = 'done';
     await task.save();
-
     const eventResult = await this.gameLogicService.processTaskCompletion(
       userId,
       task.xp,

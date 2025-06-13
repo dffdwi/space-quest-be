@@ -203,4 +203,60 @@ export class GameLogicService {
       }
     });
   }
+
+  async processMissionClaim(
+    userId: string,
+    mission: Mission,
+  ): Promise<GameEventResult> {
+    const result: GameEventResult = {
+      badgesEarned: [],
+      missionsReadyToClaim: [],
+    };
+
+    return await this.sequelize.transaction(async (tx) => {
+      const user = await this.userModel.findByPk(userId, {
+        transaction: tx,
+        lock: tx.LOCK.UPDATE,
+      });
+      if (!user) throw new Error('User not found');
+
+      user.xp += mission.rewardXp;
+      user.credits += mission.rewardCredits;
+
+      const originalLevel = user.level;
+      let newLevel = user.level;
+      while (
+        newLevel < XP_PER_LEVEL.length &&
+        user.xp >= XP_PER_LEVEL[newLevel]
+      ) {
+        newLevel++;
+      }
+      if (newLevel > originalLevel) {
+        user.level = newLevel;
+        result.leveledUp = { from: originalLevel, to: newLevel };
+      }
+
+      if (mission.rewardBadgeId) {
+        const hasBadge = await this.playerBadgeModel.findOne({
+          where: { userId, badgeId: mission.rewardBadgeId },
+          transaction: tx,
+        });
+        if (!hasBadge) {
+          await this.playerBadgeModel.create(
+            { userId, badgeId: mission.rewardBadgeId },
+            { transaction: tx },
+          );
+          const badge = await this.badgeModel.findByPk(mission.rewardBadgeId, {
+            transaction: tx,
+          });
+          if (badge) {
+            result.badgesEarned.push(badge);
+          }
+        }
+      }
+
+      await user.save({ transaction: tx });
+      return result;
+    });
+  }
 }
