@@ -9,7 +9,7 @@ import { MissionModule } from '../mission/mission.module';
 import { BadgeModule } from '../badge/badge.module';
 import { ShopModule } from '../shop/shop.module';
 import { DailyModule } from '../daily/daily.module';
-
+import { LeaderboardModule } from '../leaderboard/leaderboard.module';
 @Module({
   imports: [
     SequelizeModule.forFeature([User]),
@@ -19,6 +19,7 @@ import { DailyModule } from '../daily/daily.module';
     forwardRef(() => BadgeModule),
     forwardRef(() => ShopModule),
     forwardRef(() => DailyModule),
+    forwardRef(() => LeaderboardModule),
   ],
   controllers: [UserController],
   providers: [UserService],
