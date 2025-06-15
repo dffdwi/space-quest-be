@@ -67,23 +67,6 @@ export class CreateProjectDto {
   description?: string;
 }
 
-export class AddMemberDto {
-  @ApiProperty({
-    description: 'Email pengguna yang akan diundang',
-    example: 'crew@example.com',
-  })
-  @IsEmail()
-  email!: string;
-
-  @ApiPropertyOptional({
-    description: 'Peran anggota dalam proyek',
-    example: 'Lead Scientist',
-  })
-  @IsOptional()
-  @IsString()
-  role?: string;
-}
-
 export class ProjectDetailResponseDto {
   @ApiProperty()
   projectId!: string;
@@ -119,4 +102,21 @@ export class ProjectDetailResponseDto {
     );
     this.tasks = project.tasks.map((task) => new TaskResponseDto(task));
   }
+}
+
+export class AddMemberDto {
+  @ApiProperty({
+    description: 'ID pengguna yang akan ditambahkan',
+    example: 'd290f1ee-6c54-4b01-90e6-d701748f0851',
+  })
+  @IsUUID()
+  userId!: string;
+
+  @ApiPropertyOptional({
+    description: 'Peran anggota dalam proyek',
+    example: 'Lead Scientist',
+  })
+  @IsOptional()
+  @IsString()
+  role?: string;
 }

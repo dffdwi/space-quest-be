@@ -114,10 +114,10 @@ export class ProjectService {
       );
     }
 
-    const userToAdd = await this.userService.findOneByEmail(addMemberDto.email);
+    const userToAdd = await this.userService.findById(addMemberDto.userId);
     if (!userToAdd) {
       throw new NotFoundException(
-        `User dengan email ${addMemberDto.email} tidak ditemukan.`,
+        `User dengan ID ${addMemberDto.userId} tidak ditemukan.`,
       );
     }
 

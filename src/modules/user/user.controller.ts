@@ -6,6 +6,7 @@ import {
   Param,
   ParseIntPipe,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './user.contract';
@@ -16,6 +17,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { UserResponseDto } from './user.contract';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('Users')
 @Controller('users')
@@ -32,6 +34,14 @@ export class UserController {
   @ApiResponse({ status: 409, description: 'Email sudah terdaftar.' })
   async create(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
     return this.userService.create(createUserDto);
+  }
+
+  // @UseGuards(JwtAuthGuard)
+  @Get()
+  @ApiOperation({ summary: 'Mencari pengguna berdasarkan nama atau email' })
+  async findAll(@Query('q') searchQuery: string) {
+    const users = await this.userService.findAll(searchQuery);
+    return users;
   }
 
   /*
