@@ -1,6 +1,7 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from './user.entity';
+import { PlayerStats } from './player_stats.entity';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { TaskModule } from '../task/task.module';
@@ -12,7 +13,7 @@ import { DailyModule } from '../daily/daily.module';
 import { LeaderboardModule } from '../leaderboard/leaderboard.module';
 @Module({
   imports: [
-    SequelizeModule.forFeature([User]),
+    SequelizeModule.forFeature([User, PlayerStats]),
     forwardRef(() => TaskModule),
     forwardRef(() => ProjectModule),
     forwardRef(() => MissionModule),

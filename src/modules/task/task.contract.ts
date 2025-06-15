@@ -57,6 +57,23 @@ export class CreateTaskDto {
   @IsOptional()
   @IsInt()
   credits?: number;
+
+  @ApiPropertyOptional({
+    description: 'ID proyek jika tugas ini bagian dari proyek',
+  })
+  @IsOptional()
+  @IsUUID()
+  projectId?: string;
+
+  @ApiPropertyOptional({ description: 'ID pengguna yang ditugaskan' })
+  @IsOptional()
+  @IsUUID()
+  assignedTo?: string;
+
+  @ApiPropertyOptional({ description: 'Status tugas/kolom kanban' })
+  @IsOptional()
+  @IsString()
+  status?: string;
 }
 
 export class UpdateTaskDto extends CreateTaskDto {}

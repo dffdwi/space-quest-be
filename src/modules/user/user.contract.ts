@@ -10,6 +10,7 @@ import {
   IsUUID,
 } from 'class-validator';
 import { User } from './user.entity';
+import { PlayerStats } from './player_stats.entity';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -91,7 +92,10 @@ export class UserResponseDto {
   @IsDateString()
   lastDiscoveryDate?: Date;
 
-  constructor(user: User) {
+  @ApiProperty()
+  stats!: PlayerStats;
+
+  constructor(user: any) {
     this.userId = user.userId;
     this.name = user.name;
     this.email = user.email;
@@ -104,5 +108,6 @@ export class UserResponseDto {
     this.lastLoginDate = user.lastLoginDate;
     this.loginStreak = user.loginStreak;
     this.lastDiscoveryDate = user.lastDiscoveryDate;
+    this.stats = user.stats;
   }
 }

@@ -8,6 +8,7 @@ import {
   Default,
   HasMany,
   BelongsToMany,
+  HasOne,
 } from 'sequelize-typescript';
 import * as bcrypt from 'bcrypt';
 import { Task } from '../task/task.entity';
@@ -19,6 +20,7 @@ import { Badge } from '../badge/badge.entity';
 import { PlayerBadge } from '../badge/player_badge.entity';
 import { ShopItem } from '../shop/shop_item.entity';
 import { PlayerInventory } from '../shop/player_inventory.entity';
+import { PlayerStats } from './player_stats.entity';
 
 @Table({
   tableName: 'users',
@@ -114,6 +116,9 @@ export class User extends Model<User> {
 
   @HasMany(() => PlayerInventory)
   inventory!: PlayerInventory[];
+
+  @HasOne(() => PlayerStats)
+  stats!: PlayerStats;
 
   @BeforeCreate
   static async hashPassword(instance: User) {
