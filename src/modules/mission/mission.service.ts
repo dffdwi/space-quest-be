@@ -15,10 +15,32 @@ export class MissionService {
     private readonly playerMissionModel: typeof PlayerMission,
   ) {}
 
-  async getPlayerMissionProgress(userId: string): Promise<PlayerMission[]> {
-    return this.playerMissionModel.findAll({
+  async getPlayerMissionProgress(userId: string): Promise<any[]> {
+    const playerMissions = await this.playerMissionModel.findAll({
       where: { userId },
-      include: [Mission],
+      include: [{ model: Mission, as: 'mission' }],
+    });
+
+    if (!playerMissions) {
+      return [];
+    }
+
+    return playerMissions.map((pm) => {
+      const playerMissionObject = pm.toJSON();
+
+      return {
+        missionId: playerMissionObject.mission.missionId,
+        title: playerMissionObject.mission.title,
+        description: playerMissionObject.mission.description,
+        target: playerMissionObject.mission.target,
+        type: playerMissionObject.mission.type,
+        rewardXp: playerMissionObject.mission.rewardXp,
+        rewardCredits: playerMissionObject.mission.rewardCredits,
+        rewardBadgeId: playerMissionObject.mission.rewardBadgeId,
+        currentProgress: playerMissionObject.progress,
+        isClaimed: playerMissionObject.isClaimed,
+        lastResetDate: playerMissionObject.lastResetDate,
+      };
     });
   }
 

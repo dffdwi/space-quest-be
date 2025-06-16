@@ -11,6 +11,7 @@ import {
 } from 'class-validator';
 import { User } from './user.entity';
 import { PlayerStats } from './player_stats.entity';
+import { Badge } from '../badge/badge.entity';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -95,6 +96,9 @@ export class UserResponseDto {
   @ApiProperty()
   stats!: PlayerStats;
 
+  @ApiProperty()
+  badges?: Badge[];
+
   constructor(user: any) {
     this.userId = user.userId;
     this.name = user.name;
@@ -109,5 +113,6 @@ export class UserResponseDto {
     this.loginStreak = user.loginStreak;
     this.lastDiscoveryDate = user.lastDiscoveryDate;
     this.stats = user.stats;
+    this.badges = user.badges;
   }
 }

@@ -8,6 +8,7 @@ import { CreateUserDto } from './user.contract';
 import { User } from './user.entity';
 import { PlayerStats } from './player_stats.entity';
 import { Op } from 'sequelize';
+import { Badge } from '../badge/badge.entity';
 
 @Injectable()
 export class UserService {
@@ -51,7 +52,13 @@ export class UserService {
 
   async findById(userId: string): Promise<User> {
     const user = await this.userModel.findByPk(userId, {
-      include: [PlayerStats],
+      include: [
+        PlayerStats,
+        {
+          model: Badge,
+          through: { attributes: [] },
+        },
+      ],
     });
     if (!user) {
       throw new NotFoundException(`User dengan ID ${userId} tidak ditemukan`);
