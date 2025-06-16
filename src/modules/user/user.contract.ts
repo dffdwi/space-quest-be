@@ -12,6 +12,7 @@ import {
 import { User } from './user.entity';
 import { PlayerStats } from './player_stats.entity';
 import { Badge } from '../badge/badge.entity';
+import { PlayerInventory } from '../shop/player_inventory.entity';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -37,6 +38,11 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   name?: string;
+}
+
+export class ApplyThemeDto {
+  @IsString()
+  themeValue: string;
 }
 
 export class UserResponseDto {
@@ -99,6 +105,9 @@ export class UserResponseDto {
   @ApiProperty()
   badges?: Badge[];
 
+  @ApiPropertyOptional({ type: () => [PlayerInventory] })
+  inventory?: PlayerInventory[];
+
   constructor(user: any) {
     this.userId = user.userId;
     this.name = user.name;
@@ -114,5 +123,6 @@ export class UserResponseDto {
     this.lastDiscoveryDate = user.lastDiscoveryDate;
     this.stats = user.stats;
     this.badges = user.badges;
+    this.inventory = user.inventory;
   }
 }

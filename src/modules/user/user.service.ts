@@ -63,6 +63,11 @@ export class UserService {
           model: Badge,
           through: { attributes: [] },
         },
+        {
+          model: PlayerInventory, 
+          as: 'inventory',
+          attributes: ['itemId'], 
+        },
       ],
     });
     if (!user) {
@@ -117,5 +122,13 @@ export class UserService {
     });
 
     return this.findById(userId);
+  }
+
+  async applyTheme(userId: string, themeValue: string): Promise<User> {
+    const user = await this.findById(userId);
+
+    user.activeTheme = themeValue;
+    await user.save();
+    return user;
   }
 }

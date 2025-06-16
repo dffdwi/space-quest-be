@@ -114,11 +114,11 @@ export class User extends Model<User> {
   @BelongsToMany(() => Badge, () => PlayerBadge)
   badges!: Badge[];
 
-  @HasMany(() => PlayerInventory)
-  inventory!: PlayerInventory[];
-
   @HasOne(() => PlayerStats)
   stats!: PlayerStats;
+
+  @HasMany(() => PlayerInventory, 'userId')
+  inventory!: PlayerInventory[];
 
   @BeforeCreate
   static async hashPassword(instance: User) {

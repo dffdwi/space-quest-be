@@ -6,6 +6,7 @@ import {
   UseGuards,
   Query,
   Request,
+  Put,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './user.contract';
@@ -18,6 +19,7 @@ import {
 import { UserResponseDto } from './user.contract';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AuthenticatedUserPayload } from '../auth/strategies/local.strategy';
+import { ApplyThemeDto } from './user.contract';
 
 @ApiTags('Users')
 @Controller('users')
@@ -56,16 +58,18 @@ export class UserController {
     return new UserResponseDto(updatedUser);
   }
 
-  /*
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @Get(':id')
-  @ApiOperation({ summary: 'Mendapatkan detail user berdasarkan ID' })
-  @ApiResponse({ status: 200, description: 'Detail user.', type: UserResponseDto })
-  @ApiResponse({ status: 404, description: 'User tidak ditemukan.' })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<UserResponseDto> {
-    const user = await this.userService.findById(id);
-    return new UserResponseDto({ id: user.id, email: user.email, name: user.name });
+  @Put('/profile/apply-theme')
+  @ApiOperation({ summary: 'Menerapkan tema visual baru' })
+  async applyTheme(
+    @Request() req: { user: AuthenticatedUserPayload },
+    @Body() applyThemeDto: ApplyThemeDto,
+  ): Promise<UserResponseDto> {
+    const user = await this.userService.applyTheme(
+      req.user.userId,
+      applyThemeDto.themeValue,
+    );
+    return new UserResponseDto(user);
   }
-  */
 }
