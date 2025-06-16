@@ -9,7 +9,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './user.contract';
+import { ApplyFrameDto, CreateUserDto } from './user.contract';
 import {
   ApiTags,
   ApiOperation,
@@ -69,6 +69,21 @@ export class UserController {
     const user = await this.userService.applyTheme(
       req.user.userId,
       applyThemeDto.themeValue,
+    );
+    return new UserResponseDto(user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Put('/profile/apply-frame')
+  @ApiOperation({ summary: 'Menerapkan frame avatar baru' })
+  async applyAvatarFrame(
+    @Request() req: { user: AuthenticatedUserPayload },
+    @Body() applyFrameDto: ApplyFrameDto,
+  ): Promise<UserResponseDto> {
+    const user = await this.userService.applyAvatarFrame(
+      req.user.userId,
+      applyFrameDto.frameValue,
     );
     return new UserResponseDto(user);
   }

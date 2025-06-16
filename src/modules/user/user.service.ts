@@ -64,9 +64,9 @@ export class UserService {
           through: { attributes: [] },
         },
         {
-          model: PlayerInventory, 
+          model: PlayerInventory,
           as: 'inventory',
-          attributes: ['itemId'], 
+          attributes: ['itemId'],
         },
       ],
     });
@@ -128,6 +128,17 @@ export class UserService {
     const user = await this.findById(userId);
 
     user.activeTheme = themeValue;
+    await user.save();
+    return user;
+  }
+
+  async applyAvatarFrame(
+    userId: string,
+    frameValue: string | null,
+  ): Promise<User> {
+    const user = await this.findById(userId);
+
+    user.activeAvatarFrameId = frameValue;
     await user.save();
     return user;
   }
