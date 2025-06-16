@@ -3,10 +3,9 @@ import {
   Post,
   Body,
   Get,
-  Param,
-  ParseIntPipe,
   UseGuards,
   Query,
+  Request,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './user.contract';
@@ -18,6 +17,7 @@ import {
 } from '@nestjs/swagger';
 import { UserResponseDto } from './user.contract';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AuthenticatedUserPayload } from '../auth/strategies/local.strategy';
 
 @ApiTags('Users')
 @Controller('users')
@@ -33,7 +33,8 @@ export class UserController {
   })
   @ApiResponse({ status: 409, description: 'Email sudah terdaftar.' })
   async create(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
-    return this.userService.create(createUserDto);
+    const user = await this.userService.create(createUserDto);
+    return new UserResponseDto(user);
   }
 
   // @UseGuards(JwtAuthGuard)
@@ -42,6 +43,17 @@ export class UserController {
   async findAll(@Query('q') searchQuery: string) {
     const users = await this.userService.findAll(searchQuery);
     return users;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Post('/profile/reset')
+  @ApiOperation({ summary: 'Mereset semua progres game pengguna' })
+  async resetProgress(
+    @Request() req: { user: AuthenticatedUserPayload },
+  ): Promise<UserResponseDto> {
+    const updatedUser = await this.userService.resetProgress(req.user.userId);
+    return new UserResponseDto(updatedUser);
   }
 
   /*

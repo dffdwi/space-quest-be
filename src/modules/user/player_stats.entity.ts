@@ -20,6 +20,12 @@ export class PlayerStats extends Model<PlayerStats> {
   @Column({ type: DataType.INTEGER, defaultValue: 0 })
   totalXpEarned!: number;
 
+  @Column({ type: DataType.INTEGER, defaultValue: 0 })
+  totalCreditsEarned!: number;
+
+  @Column({ type: DataType.INTEGER, defaultValue: 0 })
+  longestMissionStreak!: number;
+
   @BelongsTo(() => User)
   user!: User;
 }
