@@ -10,7 +10,6 @@ import {
   IsUUID,
   IsUrl,
 } from 'class-validator';
-import { User } from './user.entity';
 import { PlayerStats } from './player_stats.entity';
 import { Badge } from '../badge/badge.entity';
 import { PlayerInventory } from '../shop/player_inventory.entity';
@@ -124,6 +123,9 @@ export class UserResponseDto {
   @ApiPropertyOptional({ type: () => [PlayerInventory] })
   inventory?: PlayerInventory[];
 
+  @ApiPropertyOptional({ description: 'Jumlah undangan proyek yang pending' })
+  pendingInvitationCount?: number;
+
   constructor(user: any) {
     this.userId = user.userId;
     this.name = user.name;
@@ -140,5 +142,6 @@ export class UserResponseDto {
     this.stats = user.stats;
     this.badges = user.badges;
     this.inventory = user.inventory;
+    this.pendingInvitationCount = user.receivedInvitations?.length || 0;
   }
 }

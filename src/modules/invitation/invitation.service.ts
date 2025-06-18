@@ -76,4 +76,26 @@ export class InvitationService {
       throw error;
     }
   }
+
+  async reject(
+    invitationId: string,
+    userId: string,
+  ): Promise<ProjectInvitation> {
+    const invitation = await this.invitationModel.findByPk(invitationId);
+
+    if (!invitation) {
+      throw new NotFoundException('Undangan tidak ditemukan.');
+    }
+    if (invitation.inviteeId !== userId) {
+      throw new ForbiddenException('Anda tidak berhak menolak undangan ini.');
+    }
+    if (invitation.status !== 'PENDING') {
+      throw new BadRequestException('Undangan ini sudah tidak valid lagi.');
+    }
+
+    invitation.status = 'REJECTED';
+    await invitation.save();
+
+    return invitation;
+  }
 }

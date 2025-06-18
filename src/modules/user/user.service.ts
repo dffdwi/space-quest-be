@@ -13,6 +13,7 @@ import { PlayerMission } from '../mission/player_mission.entity';
 import { PlayerBadge } from '../badge/player_badge.entity';
 import { PlayerInventory } from '../shop/player_inventory.entity';
 import { Task } from '../task/task.entity';
+import { ProjectInvitation } from '../project/project_invitation.entity';
 
 @Injectable()
 export class UserService {
@@ -67,6 +68,12 @@ export class UserService {
           model: PlayerInventory,
           as: 'inventory',
           attributes: ['itemId'],
+        },
+        {
+          model: ProjectInvitation,
+          as: 'receivedInvitations',
+          where: { status: 'PENDING' },
+          required: false,
         },
       ],
     });

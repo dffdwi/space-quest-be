@@ -35,4 +35,13 @@ export class InvitationController {
   ) {
     return this.invitationService.accept(invitationId, req.user.userId);
   }
+
+  @Put(':invitationId/reject')
+  @ApiOperation({ summary: 'Menolak undangan untuk bergabung ke proyek' })
+  async reject(
+    @Request() req: { user: AuthenticatedUserPayload },
+    @Param('invitationId', new ParseUUIDPipe()) invitationId: string,
+  ) {
+    return this.invitationService.reject(invitationId, req.user.userId);
+  }
 }
