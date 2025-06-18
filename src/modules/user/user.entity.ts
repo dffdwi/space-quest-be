@@ -21,6 +21,7 @@ import { PlayerBadge } from '../badge/player_badge.entity';
 import { ShopItem } from '../shop/shop_item.entity';
 import { PlayerInventory } from '../shop/player_inventory.entity';
 import { PlayerStats } from './player_stats.entity';
+import { ProjectInvitation } from '../project/project_invitation.entity';
 
 @Table({
   tableName: 'users',
@@ -119,6 +120,12 @@ export class User extends Model<User> {
 
   @HasMany(() => PlayerInventory, 'userId')
   inventory!: PlayerInventory[];
+
+  @HasMany(() => ProjectInvitation, 'inviterId')
+  sentInvitations!: ProjectInvitation[];
+
+  @HasMany(() => ProjectInvitation, 'inviteeId')
+  receivedInvitations!: ProjectInvitation[];
 
   @BeforeCreate
   static async hashPassword(instance: User) {
