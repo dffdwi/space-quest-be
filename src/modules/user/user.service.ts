@@ -142,4 +142,16 @@ export class UserService {
     await user.save();
     return user;
   }
+
+  async updateProfile(
+    userId: string,
+    name: string,
+    avatarUrl: string,
+  ): Promise<User> {
+    const user = await this.findById(userId);
+    user.name = name;
+    user.avatarUrl = avatarUrl;
+    await user.save();
+    return user;
+  }
 }

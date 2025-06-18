@@ -8,6 +8,7 @@ import {
   IsInt,
   IsDateString,
   IsUUID,
+  IsUrl,
 } from 'class-validator';
 import { User } from './user.entity';
 import { PlayerStats } from './player_stats.entity';
@@ -49,6 +50,15 @@ export class ApplyFrameDto {
   @IsOptional()
   @IsString()
   frameValue: string | null;
+}
+
+export class UpdateProfileDto {
+  @IsString()
+  name: string;
+
+  @IsUrl()
+  @IsOptional()
+  avatarUrl: string;
 }
 
 export class UserResponseDto {
