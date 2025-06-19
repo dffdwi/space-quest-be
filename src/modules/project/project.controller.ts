@@ -79,4 +79,20 @@ export class ProjectController {
       req.user.userId,
     );
   }
+
+  @Post(':projectId/invitations')
+  @ApiOperation({
+    summary: 'Mengirim undangan ke pengguna untuk bergabung ke proyek',
+  })
+  async sendInvitation(
+    @Request() req: { user: AuthenticatedUserPayload },
+    @Param('projectId', new ParseUUIDPipe()) projectId: string,
+    @Body() addMemberDto: AddMemberDto,
+  ) {
+    return this.projectService.sendInvitation(
+      projectId,
+      addMemberDto,
+      req.user.userId,
+    );
+  }
 }

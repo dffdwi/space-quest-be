@@ -14,6 +14,7 @@ import { User } from '../user/user.entity';
 import { Task } from '../task/task.entity';
 import { ProjectColumn } from './project_column.entity';
 import { ProjectMember } from './project_member.entity';
+import { ProjectInvitation } from './project_invitation.entity';
 
 @Table({
   tableName: 'projects',
@@ -46,4 +47,7 @@ export class Project extends Model<Project> {
 
   @BelongsToMany(() => User, () => ProjectMember)
   members!: User[];
+
+  @HasMany(() => ProjectInvitation)
+  invitations!: ProjectInvitation[];
 }

@@ -16,6 +16,7 @@ import { MissionModule } from './modules/mission/mission.module';
 import { ShopModule } from './modules/shop/shop.module';
 import { DailyModule } from './modules/daily/daily.module';
 import { LeaderboardModule } from './modules/leaderboard/leaderboard.module';
+import { InvitationModule } from './modules/invitation/invitation.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { LeaderboardModule } from './modules/leaderboard/leaderboard.module';
     ShopModule,
     DailyModule,
     LeaderboardModule,
+    InvitationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

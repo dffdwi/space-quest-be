@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ConflictException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Project } from './project.entity';
@@ -12,6 +13,7 @@ import { ProjectMember } from './project_member.entity';
 import { ProjectColumn } from './project_column.entity';
 import { Task } from '../task/task.entity';
 import { UserService } from '../user/user.service';
+import { ProjectInvitation } from './project_invitation.entity';
 
 @Injectable()
 export class ProjectService {
@@ -22,6 +24,8 @@ export class ProjectService {
     private readonly projectMemberModel: typeof ProjectMember,
     @InjectModel(ProjectColumn)
     private readonly projectColumnModel: typeof ProjectColumn,
+    @InjectModel(ProjectInvitation)
+    private readonly projectInvitationModel: typeof ProjectInvitation,
     private readonly userService: UserService,
   ) {}
 
@@ -71,9 +75,7 @@ export class ProjectService {
           model: User,
           as: 'members',
           attributes: ['userId', 'name', 'avatarUrl'],
-          through: {
-            attributes: ['role'],
-          },
+          through: { attributes: ['role'] },
         },
         {
           model: ProjectColumn,
@@ -83,6 +85,17 @@ export class ProjectService {
         {
           model: Task,
           as: 'tasks',
+        },
+        {
+          model: ProjectInvitation,
+          as: 'invitations',
+          include: [
+            {
+              model: User,
+              as: 'invitee',
+              attributes: ['userId', 'name', 'avatarUrl'],
+            },
+          ],
         },
       ],
     });
@@ -100,7 +113,6 @@ export class ProjectService {
 
     return project;
   }
-
   async addMember(
     projectId: string,
     addMemberDto: AddMemberDto,
@@ -132,6 +144,57 @@ export class ProjectService {
       projectId,
       userId: userToAdd.userId,
       role: addMemberDto.role || 'Crew Member',
+    });
+  }
+
+  async sendInvitation(
+    projectId: string,
+    addMemberDto: AddMemberDto,
+    inviterId: string,
+  ): Promise<ProjectInvitation> {
+    const project = await this.findById(projectId, inviterId);
+
+    if (project.ownerId !== inviterId) {
+      throw new ForbiddenException(
+        'Hanya pemilik proyek yang bisa mengirim undangan.',
+      );
+    }
+
+    const { userId: inviteeId, role } = addMemberDto;
+
+    if (inviteeId === inviterId) {
+      throw new BadRequestException('Anda tidak bisa mengundang diri sendiri.');
+    }
+
+    const invitee = await this.userService.findById(inviteeId);
+    if (!invitee) {
+      throw new NotFoundException(
+        `Pengguna dengan ID ${inviteeId} tidak ditemukan.`,
+      );
+    }
+
+    const existingMember = await this.projectMemberModel.findOne({
+      where: { projectId, userId: inviteeId },
+    });
+    if (existingMember) {
+      throw new ConflictException('Pengguna ini sudah menjadi anggota proyek.');
+    }
+
+    const existingInvitation = await this.projectInvitationModel.findOne({
+      where: { projectId, inviteeId, status: 'PENDING' },
+    });
+    if (existingInvitation) {
+      throw new ConflictException(
+        'Undangan untuk pengguna ini sudah terkirim dan masih pending.',
+      );
+    }
+
+    return this.projectInvitationModel.create({
+      projectId,
+      inviterId,
+      inviteeId,
+      role: role || 'Crew Member',
+      status: 'PENDING',
     });
   }
 }
