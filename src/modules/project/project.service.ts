@@ -75,9 +75,7 @@ export class ProjectService {
           model: User,
           as: 'members',
           attributes: ['userId', 'name', 'avatarUrl'],
-          through: {
-            attributes: ['role'],
-          },
+          through: { attributes: ['role'] },
         },
         {
           model: ProjectColumn,
@@ -87,6 +85,17 @@ export class ProjectService {
         {
           model: Task,
           as: 'tasks',
+        },
+        {
+          model: ProjectInvitation,
+          as: 'invitations',
+          include: [
+            {
+              model: User,
+              as: 'invitee',
+              attributes: ['userId', 'name', 'avatarUrl'],
+            },
+          ],
         },
       ],
     });
@@ -104,7 +113,6 @@ export class ProjectService {
 
     return project;
   }
-
   async addMember(
     projectId: string,
     addMemberDto: AddMemberDto,

@@ -32,6 +32,21 @@ class ProjectMemberResponseDto {
   }
 }
 
+class ProjectInvitationResponseDto {
+  @ApiProperty()
+  invitee!: { userId: string; name: string; avatarUrl: string };
+  @ApiProperty()
+  status!: string;
+  @ApiProperty()
+  role!: string;
+
+  constructor(invitation: any) {
+    this.invitee = invitation.invitee;
+    this.status = invitation.status;
+    this.role = invitation.role;
+  }
+}
+
 class ProjectColumnResponseDto {
   @ApiProperty()
   columnId!: string;
@@ -89,6 +104,9 @@ export class ProjectDetailResponseDto {
   @ApiProperty({ type: () => [TaskResponseDto] })
   tasks!: TaskResponseDto[];
 
+  @ApiProperty({ type: () => [ProjectInvitationResponseDto] })
+  invitations!: ProjectInvitationResponseDto[];
+
   constructor(project: Project) {
     this.projectId = project.projectId;
     this.name = project.name;
@@ -101,6 +119,9 @@ export class ProjectDetailResponseDto {
       (column) => new ProjectColumnResponseDto(column),
     );
     this.tasks = project.tasks.map((task) => new TaskResponseDto(task));
+    this.invitations = project.invitations.map(
+      (inv) => new ProjectInvitationResponseDto(inv),
+    );
   }
 }
 
