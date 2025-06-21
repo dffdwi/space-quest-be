@@ -114,6 +114,12 @@ export class TaskResponseDto {
   @ApiPropertyOptional()
   completedAt?: Date;
 
+  @ApiProperty({ enum: ['personal', 'project'] })
+  type!: string;
+
+  @ApiProperty()
+  isRewardClaimed!: boolean;
+
   constructor(task: Task) {
     this.taskId = task.taskId;
     this.userId = task.userId;
@@ -126,6 +132,8 @@ export class TaskResponseDto {
     this.credits = task.credits;
     this.completed = task.completed;
     this.completedAt = task.completedAt;
+    this.type = task.type;
+    this.isRewardClaimed = task.isRewardClaimed;
   }
 }
 
