@@ -74,4 +74,12 @@ export class Task extends Model<Task> {
   @AllowNull(true)
   @Column(DataType.DATE)
   completedAt?: Date;
+
+  @Default('personal')
+  @Column(DataType.ENUM('personal', 'project'))
+  type!: string;
+
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  isRewardClaimed!: boolean;
 }

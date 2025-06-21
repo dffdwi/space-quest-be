@@ -37,7 +37,11 @@ export class TaskService {
 
   async create(userId: string, createTaskDto: CreateTaskDto): Promise<Task> {
     const { dueDate, ...rest } = createTaskDto;
-    const taskPayload: any = { ...rest, userId };
+    const taskPayload: any = {
+      ...rest,
+      userId,
+      type: createTaskDto.projectId ? 'project' : 'personal',
+    };
     if (dueDate) {
       taskPayload.dueDate = new Date(dueDate);
     }
@@ -74,14 +78,46 @@ export class TaskService {
   ): Promise<{ task: Task; eventResult: GameEventResult }> {
     const task = await this.findById(taskId, userId);
 
+    if (task.type !== 'personal') {
+      throw new BadRequestException('Endpoint ini hanya untuk tugas personal.');
+    }
     if (task.completed) {
       throw new BadRequestException('Tugas ini sudah diselesaikan.');
     }
 
     task.completed = true;
     task.completedAt = new Date();
-    task.status = 'done';
     await task.save();
+    const eventResult = await this.gameLogicService.processTaskCompletion(
+      userId,
+      task.xp,
+      task.credits,
+    );
+
+    return { task, eventResult };
+  }
+
+  async claimProjectTaskReward(
+    taskId: string,
+    userId: string,
+  ): Promise<{ task: Task; eventResult: GameEventResult }> {
+    const task = await this.findById(taskId, userId);
+
+    if (task.type !== 'project') {
+      throw new BadRequestException('Endpoint ini hanya untuk tugas proyek.');
+    }
+    if (task.status !== 'done') {
+      throw new BadRequestException(
+        'Tugas harus berada di kolom "Done" untuk klaim hadiah.',
+      );
+    }
+    if (task.isRewardClaimed) {
+      throw new BadRequestException('Hadiah untuk tugas ini sudah diklaim.');
+    }
+
+    task.isRewardClaimed = true;
+    await task.save();
+
     const eventResult = await this.gameLogicService.processTaskCompletion(
       userId,
       task.xp,

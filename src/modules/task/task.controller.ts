@@ -102,4 +102,24 @@ export class TaskController {
       eventResult,
     };
   }
+
+  @Post(':taskId/claim-reward')
+  @ApiOperation({ summary: 'Mengklaim hadiah untuk tugas proyek yang selesai' })
+  @ApiResponse({
+    status: 200,
+    description: 'Hadiah berhasil diklaim.',
+  })
+  async claimProjectTaskReward(
+    @Request() req: { user: AuthenticatedUserPayload },
+    @Param('taskId', new ParseUUIDPipe()) taskId: string,
+  ) {
+    const { task, eventResult } = await this.taskService.claimProjectTaskReward(
+      taskId,
+      req.user.userId,
+    );
+    return {
+      task: new TaskResponseDto(task),
+      eventResult,
+    };
+  }
 }
