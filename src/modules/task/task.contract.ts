@@ -8,6 +8,7 @@ import {
   IsUUID,
 } from 'class-validator';
 import { Task } from './task.entity';
+import { UserResponseDto } from '../user/user.contract';
 
 export class CreateTaskDto {
   @ApiProperty({
@@ -131,6 +132,9 @@ export class TaskResponseDto {
   @ApiPropertyOptional()
   statusChangeMessage?: string;
 
+  @ApiPropertyOptional({ type: () => UserResponseDto })
+  owner?: UserResponseDto;
+
   constructor(task: Task) {
     this.taskId = task.taskId;
     this.userId = task.userId;
@@ -148,6 +152,7 @@ export class TaskResponseDto {
     this.statusChangeRequest = task.statusChangeRequest;
     this.statusChangeRequesterId = task.statusChangeRequesterId;
     this.statusChangeMessage = task.statusChangeMessage;
+    this.owner = task.owner;
   }
 }
 

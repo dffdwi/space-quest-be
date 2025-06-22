@@ -85,6 +85,13 @@ export class ProjectService {
         {
           model: Task,
           as: 'tasks',
+          include: [
+            {
+              model: User,
+              as: 'owner',
+              attributes: ['userId', 'name', 'avatarUrl'],
+            },
+          ],
         },
         {
           model: ProjectInvitation,
@@ -110,9 +117,9 @@ export class ProjectService {
     if (!isMember) {
       throw new ForbiddenException('Anda bukan anggota dari proyek ini.');
     }
-
     return project;
   }
+
   async addMember(
     projectId: string,
     addMemberDto: AddMemberDto,
