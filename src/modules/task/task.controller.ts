@@ -20,6 +20,8 @@ import { TaskService } from './task.service';
 import {
   CreateTaskDto,
   MoveTaskDto,
+  RequestMoveDto,
+  ReviewMoveDto,
   TaskResponseDto,
   UpdateTaskDto,
 } from './task.contract';
@@ -68,7 +70,9 @@ export class TaskController {
   }
 
   @Put(':taskId/move')
-  @ApiOperation({ summary: 'Memindahkan tugas ke kolom Kanban lain' })
+  @ApiOperation({
+    summary: 'Memindahkan tugas ke kolom Kanban lain (Hanya Owner)',
+  })
   @ApiResponse({ status: 200, type: TaskResponseDto })
   async moveTask(
     @Request() req: { user: AuthenticatedUserPayload },
@@ -121,5 +125,53 @@ export class TaskController {
       task: new TaskResponseDto(task),
       eventResult,
     };
+  }
+
+  @Post(':taskId/request-move')
+  @ApiOperation({ summary: 'Mengajukan permintaan untuk memindahkan tugas' })
+  @ApiResponse({ status: 200, type: TaskResponseDto })
+  async requestMove(
+    @Request() req: { user: AuthenticatedUserPayload },
+    @Param('taskId', new ParseUUIDPipe()) taskId: string,
+    @Body() requestMoveDto: RequestMoveDto,
+  ) {
+    const task = await this.taskService.requestMove(
+      taskId,
+      req.user.userId,
+      requestMoveDto.targetStatus,
+      requestMoveDto.message,
+    );
+    return new TaskResponseDto(task);
+  }
+
+  @Post(':taskId/review-move')
+  @ApiOperation({
+    summary: 'Menyetujui atau menolak permintaan perpindahan tugas',
+  })
+  @ApiResponse({ status: 200, type: TaskResponseDto })
+  async reviewMove(
+    @Request() req: { user: AuthenticatedUserPayload },
+    @Param('taskId', new ParseUUIDPipe()) taskId: string,
+    @Body() reviewMoveDto: ReviewMoveDto,
+  ) {
+    const task = await this.taskService.reviewMove(
+      taskId,
+      req.user.userId,
+      reviewMoveDto.action,
+    );
+
+    if (
+      reviewMoveDto.action === 'approve' &&
+      task.status === 'done' &&
+      !task.isRewardClaimed
+    ) {
+      await this.taskService.claimProjectTaskReward(taskId, req.user.userId);
+    }
+
+    const updatedTask = await this.taskService.findById(
+      taskId,
+      req.user.userId,
+    );
+    return new TaskResponseDto(updatedTask);
   }
 }

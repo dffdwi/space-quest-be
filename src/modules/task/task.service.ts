@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Task } from './task.entity';
@@ -72,8 +73,36 @@ export class TaskService {
     return task;
   }
 
-  async move(taskId: string, userId: string, newStatus: string): Promise<Task> {
-    const task = await this.findById(taskId, userId);
+  async move(
+    taskId: string,
+    currentUserId: string,
+    newStatus: string,
+  ): Promise<Task> {
+    const task = await this.taskModel.findByPk(taskId, { include: [Project] });
+
+    if (!task) {
+      throw new NotFoundException(`Tugas dengan ID ${taskId} tidak ditemukan.`);
+    }
+
+    if (task.type === 'project') {
+      if (!task.project) {
+        throw new NotFoundException(
+          'Data proyek untuk tugas ini tidak ditemukan.',
+        );
+      }
+      if (task.project.ownerId !== currentUserId) {
+        throw new ForbiddenException(
+          'Hanya pemilik proyek yang bisa memindahkan tugas secara langsung. Silakan gunakan fitur "request move".',
+        );
+      }
+    } else {
+      if (task.userId !== currentUserId) {
+        throw new ForbiddenException(
+          'Anda tidak bisa memindahkan tugas milik orang lain.',
+        );
+      }
+    }
+
     task.status = newStatus;
     await task.save();
     return task;
@@ -94,7 +123,9 @@ export class TaskService {
 
     task.completed = true;
     task.completedAt = new Date();
+    task.isRewardClaimed = true;
     await task.save();
+
     const eventResult = await this.gameLogicService.processTaskCompletion(
       userId,
       task.xp,
@@ -152,5 +183,62 @@ export class TaskService {
     );
 
     return { task, eventResult };
+  }
+
+  async requestMove(
+    taskId: string,
+    requesterId: string,
+    targetStatus: string,
+    message?: string,
+  ): Promise<Task> {
+    const task = await this.taskModel.findByPk(taskId, { include: [Project] });
+
+    if (!task || !task.project) {
+      throw new NotFoundException('Tugas proyek tidak ditemukan.');
+    }
+
+    if (task.project.ownerId === requesterId) {
+      throw new BadRequestException(
+        'Pemilik proyek bisa langsung memindahkan tugas.',
+      );
+    }
+
+    task.statusChangeRequest = targetStatus;
+    task.statusChangeRequesterId = requesterId;
+    task.statusChangeMessage = message;
+
+    return task.save();
+  }
+
+  async reviewMove(
+    taskId: string,
+    ownerId: string,
+    action: 'approve' | 'reject',
+  ): Promise<Task> {
+    const task = await this.taskModel.findByPk(taskId, { include: [Project] });
+
+    if (!task || !task.project) {
+      throw new NotFoundException('Tugas proyek tidak ditemukan.');
+    }
+    if (task.project.ownerId !== ownerId) {
+      throw new ForbiddenException(
+        'Hanya pemilik proyek yang bisa meninjau permintaan.',
+      );
+    }
+    if (!task.statusChangeRequest) {
+      throw new BadRequestException(
+        'Tidak ada permintaan perpindahan untuk tugas ini.',
+      );
+    }
+
+    if (action === 'approve') {
+      task.status = task.statusChangeRequest;
+    }
+
+    task.statusChangeRequest = null;
+    task.statusChangeRequesterId = null;
+    task.statusChangeMessage = null;
+
+    return task.save();
   }
 }

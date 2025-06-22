@@ -122,6 +122,15 @@ export class TaskResponseDto {
   @ApiProperty()
   isRewardClaimed!: boolean;
 
+  @ApiPropertyOptional()
+  statusChangeRequest?: string;
+
+  @ApiPropertyOptional()
+  statusChangeRequesterId?: string;
+
+  @ApiPropertyOptional()
+  statusChangeMessage?: string;
+
   constructor(task: Task) {
     this.taskId = task.taskId;
     this.userId = task.userId;
@@ -136,6 +145,9 @@ export class TaskResponseDto {
     this.completedAt = task.completedAt;
     this.type = task.type;
     this.isRewardClaimed = task.isRewardClaimed;
+    this.statusChangeRequest = task.statusChangeRequest;
+    this.statusChangeRequesterId = task.statusChangeRequesterId;
+    this.statusChangeMessage = task.statusChangeMessage;
   }
 }
 
@@ -147,4 +159,32 @@ export class MoveTaskDto {
   @IsString()
   @IsNotEmpty()
   newStatus!: string;
+}
+
+export class RequestMoveDto {
+  @ApiProperty({
+    description: 'ID status atau kolom tujuan yang diminta',
+    example: 'inprogress',
+  })
+  @IsString()
+  @IsNotEmpty()
+  targetStatus!: string;
+
+  @ApiPropertyOptional({
+    description: 'Pesan opsional untuk owner proyek',
+    example: 'Fitur A sudah selesai, siap untuk di-review.',
+  })
+  @IsOptional()
+  @IsString()
+  message?: string;
+}
+
+export class ReviewMoveDto {
+  @ApiProperty({
+    description: "Aksi yang diambil oleh owner ('approve' atau 'reject')",
+    enum: ['approve', 'reject'],
+  })
+  @IsString()
+  @IsNotEmpty()
+  action!: 'approve' | 'reject';
 }

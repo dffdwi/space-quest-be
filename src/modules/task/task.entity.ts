@@ -94,4 +94,20 @@ export class Task extends Model<Task> {
   @Default(false)
   @Column(DataType.BOOLEAN)
   isRewardClaimed!: boolean;
+
+  @AllowNull(true)
+  @Column(DataType.STRING)
+  statusChangeRequest?: string;
+
+  @ForeignKey(() => User)
+  @AllowNull(true)
+  @Column(DataType.UUID)
+  statusChangeRequesterId?: string;
+
+  @BelongsTo(() => User, 'statusChangeRequesterId')
+  statusChangeRequester?: User;
+
+  @AllowNull(true)
+  @Column(DataType.TEXT)
+  statusChangeMessage?: string;
 }
