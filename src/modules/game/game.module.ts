@@ -8,13 +8,24 @@ import { Task } from '../task/task.entity';
 import { PlayerMission } from '../mission/player_mission.entity';
 import { PlayerBadge } from '../badge/player_badge.entity';
 import { Mission } from '../mission/mission.entity';
+import { ShopModule } from '../shop/shop.module';
+import { ShopItem } from '../shop/shop_item.entity';
+import { PlayerActivePowerUp } from '../shop/player_active_powerup.entity';
 
 @Module({
   imports: [
     forwardRef(() => UserModule),
-    MissionModule,
-    BadgeModule,
-    SequelizeModule.forFeature([Task, PlayerMission, PlayerBadge, Mission]),
+    forwardRef(() => MissionModule),
+    forwardRef(() => BadgeModule),
+    forwardRef(() => ShopModule),
+    SequelizeModule.forFeature([
+      Task,
+      PlayerMission,
+      PlayerBadge,
+      Mission,
+      PlayerActivePowerUp,
+      ShopItem,
+    ]),
   ],
   providers: [GameLogicService],
   exports: [GameLogicService],

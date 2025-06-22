@@ -8,6 +8,8 @@ import { Badge } from '../badge/badge.entity';
 import { Sequelize } from 'sequelize-typescript';
 import { Op } from 'sequelize';
 import { Task } from '../task/task.entity';
+import { PlayerActivePowerUp } from '../shop/player_active_powerup.entity';
+import { ShopItem } from '../shop/shop_item.entity';
 
 export const XP_PER_LEVEL = [
   0, 100, 250, 500, 850, 1300, 1850, 2500, 3250, 4100, 5000,
@@ -17,6 +19,7 @@ export interface GameEventResult {
   leveledUp?: { from: number; to: number };
   badgesEarned?: Badge[];
   missionsReadyToClaim?: Mission[];
+  powerUpConsumed?: { name: string };
 }
 
 const STATIC_BADGE_IDS = {
@@ -45,6 +48,8 @@ export class GameLogicService {
     private readonly playerBadgeModel: typeof PlayerBadge,
     @InjectModel(Mission) private readonly missionModel: typeof Mission,
     @InjectModel(Badge) private readonly badgeModel: typeof Badge,
+    @InjectModel(PlayerActivePowerUp)
+    private readonly playerActivePowerUpModel: typeof PlayerActivePowerUp,
     private sequelize: Sequelize,
   ) {}
 
@@ -155,52 +160,78 @@ export class GameLogicService {
     };
 
     return await this.sequelize.transaction(async (tx) => {
-      try {
-        const user = await this.userModel.findByPk(userId, {
-          transaction: tx,
-          lock: tx.LOCK.UPDATE,
-        });
-        if (!user) throw new Error('User not found');
+      const transactionHost = { transaction: tx };
 
-        const originalLevel = user.level;
-        user.xp += taskXP;
-        user.credits += taskCredits;
+      const user = await this.userModel.findByPk(userId, {
+        ...transactionHost,
+        lock: tx.LOCK.UPDATE,
+      });
 
-        let newLevel = user.level;
-        while (
-          newLevel < XP_PER_LEVEL.length &&
-          user.xp >= XP_PER_LEVEL[newLevel]
-        ) {
-          newLevel++;
+      if (!user) throw new Error('User not found');
+
+      let finalXP = taskXP;
+
+      const xpBoostPowerUp = await this.playerActivePowerUpModel.findOne({
+        where: { userId },
+        include: [
+          {
+            model: ShopItem,
+            where: { value: { [Op.like]: '%xp_boost%' } },
+          },
+        ],
+        ...transactionHost,
+      });
+
+      if (xpBoostPowerUp) {
+        finalXP *= 2;
+        result.powerUpConsumed = { name: xpBoostPowerUp.item.name };
+
+        if (xpBoostPowerUp.usesLeft !== null) {
+          xpBoostPowerUp.usesLeft -= 1;
         }
-        if (newLevel > originalLevel) {
-          user.level = newLevel;
-          result.leveledUp = { from: originalLevel, to: newLevel };
+
+        if (xpBoostPowerUp.usesLeft !== null && xpBoostPowerUp.usesLeft <= 0) {
+          await xpBoostPowerUp.destroy({ transaction: tx });
+        } else {
+          await xpBoostPowerUp.save(transactionHost);
         }
-        await user.save({ transaction: tx });
-
-        const completedTasksCount = await this.taskModel.count({
-          where: { userId: user.userId, completed: true },
-          transaction: tx,
-        });
-
-        result.missionsReadyToClaim = await this.updateMissionProgress(
-          user,
-          completedTasksCount,
-          tx,
-        );
-
-        result.badgesEarned = await this.checkAndAwardBadges(
-          user,
-          completedTasksCount,
-          tx,
-        );
-
-        return result;
-      } catch (error) {
-        this.logger.error('Gagal memproses penyelesaian tugas', error.stack);
-        throw error;
       }
+
+      const originalLevel = user.level;
+      user.xp += finalXP;
+      user.credits += taskCredits;
+
+      let newLevel = user.level;
+      while (
+        newLevel < XP_PER_LEVEL.length &&
+        user.xp >= XP_PER_LEVEL[newLevel]
+      ) {
+        newLevel++;
+      }
+      if (newLevel > originalLevel) {
+        user.level = newLevel;
+        result.leveledUp = { from: originalLevel, to: newLevel };
+      }
+
+      await user.save(transactionHost);
+
+      const completedTasksCount = await this.taskModel.count({
+        where: { userId, completed: true },
+        ...transactionHost,
+      });
+
+      result.missionsReadyToClaim = await this.updateMissionProgress(
+        user,
+        completedTasksCount,
+        tx,
+      );
+      result.badgesEarned = await this.checkAndAwardBadges(
+        user,
+        completedTasksCount,
+        tx,
+      );
+
+      return result;
     });
   }
 

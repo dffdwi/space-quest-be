@@ -13,6 +13,7 @@ import {
 import { PlayerStats } from './player_stats.entity';
 import { Badge } from '../badge/badge.entity';
 import { PlayerInventory } from '../shop/player_inventory.entity';
+import { PlayerActivePowerUp } from '../shop/player_active_powerup.entity';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -126,6 +127,9 @@ export class UserResponseDto {
   @ApiPropertyOptional({ description: 'Jumlah undangan proyek yang pending' })
   pendingInvitationCount?: number;
 
+  @ApiPropertyOptional({ type: () => [PlayerActivePowerUp] })
+  activePowerUps?: PlayerActivePowerUp[];
+
   constructor(user: any) {
     this.userId = user.userId;
     this.name = user.name;
@@ -143,5 +147,6 @@ export class UserResponseDto {
     this.badges = user.badges;
     this.inventory = user.inventory;
     this.pendingInvitationCount = user.receivedInvitations?.length || 0;
+    this.activePowerUps = user.activePowerUps;
   }
 }

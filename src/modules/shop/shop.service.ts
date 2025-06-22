@@ -8,6 +8,7 @@ import { User } from '../user/user.entity';
 import { ShopItem } from './shop_item.entity';
 import { PlayerInventory } from './player_inventory.entity';
 import { Sequelize } from 'sequelize-typescript';
+import { PlayerActivePowerUp } from './player_active_powerup.entity';
 
 @Injectable()
 export class ShopService {
@@ -18,10 +19,15 @@ export class ShopService {
     private readonly playerInventoryModel: typeof PlayerInventory,
     @InjectModel(User)
     private readonly userModel: typeof User,
+    @InjectModel(PlayerActivePowerUp)
+    private readonly playerActivePowerUpModel: typeof PlayerActivePowerUp,
     private sequelize: Sequelize,
   ) {}
 
-  async purchaseItem(userId: string, itemId: string): Promise<PlayerInventory> {
+  async purchaseItem(
+    userId: string,
+    itemId: string,
+  ): Promise<PlayerInventory | PlayerActivePowerUp> {
     const item = await this.shopItemModel.findByPk(itemId);
     if (!item) {
       throw new NotFoundException('Item tidak ditemukan di toko.');
@@ -36,14 +42,24 @@ export class ShopService {
       user.credits -= item.price;
       await user.save({ transaction: tx });
 
-      const inventoryItem = await this.playerInventoryModel.create(
-        {
-          userId,
-          itemId,
-        },
-        { transaction: tx },
-      );
-      return inventoryItem;
+      if (item.type === 'power_up') {
+        return this.playerActivePowerUpModel.create(
+          {
+            userId,
+            itemId,
+            usesLeft: item.duration,
+          },
+          { transaction: tx },
+        );
+      } else {
+        return this.playerInventoryModel.create(
+          {
+            userId,
+            itemId,
+          },
+          { transaction: tx },
+        );
+      }
     });
   }
 }

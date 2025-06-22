@@ -14,6 +14,8 @@ import { PlayerBadge } from '../badge/player_badge.entity';
 import { PlayerInventory } from '../shop/player_inventory.entity';
 import { Task } from '../task/task.entity';
 import { ProjectInvitation } from '../project/project_invitation.entity';
+import { PlayerActivePowerUp } from '../shop/player_active_powerup.entity';
+import { ShopItem } from '../shop/shop_item.entity';
 
 @Injectable()
 export class UserService {
@@ -74,6 +76,11 @@ export class UserService {
           as: 'receivedInvitations',
           where: { status: 'PENDING' },
           required: false,
+        },
+        {
+          model: PlayerActivePowerUp,
+          as: 'activePowerUps',
+          include: [ShopItem],
         },
       ],
     });

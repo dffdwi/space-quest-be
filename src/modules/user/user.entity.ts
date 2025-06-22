@@ -22,6 +22,7 @@ import { ShopItem } from '../shop/shop_item.entity';
 import { PlayerInventory } from '../shop/player_inventory.entity';
 import { PlayerStats } from './player_stats.entity';
 import { ProjectInvitation } from '../project/project_invitation.entity';
+import { PlayerActivePowerUp } from '../shop/player_active_powerup.entity';
 
 @Table({
   tableName: 'users',
@@ -126,6 +127,9 @@ export class User extends Model<User> {
 
   @HasMany(() => ProjectInvitation, 'inviteeId')
   receivedInvitations!: ProjectInvitation[];
+
+  @HasMany(() => PlayerActivePowerUp, 'userId')
+  activePowerUps!: PlayerActivePowerUp[];
 
   @BeforeCreate
   static async hashPassword(instance: User) {
