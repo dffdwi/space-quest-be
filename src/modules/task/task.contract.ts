@@ -65,7 +65,10 @@ export class CreateTaskDto {
   @IsUUID()
   projectId?: string;
 
-  @ApiPropertyOptional({ description: 'ID pengguna yang ditugaskan' })
+  @ApiPropertyOptional({
+    description:
+      'ID pengguna yang akan mengerjakan tugas ini. Jika kosong, akan diisi oleh pembuat tugas.',
+  })
   @IsOptional()
   @IsUUID()
   assignedTo?: string;
@@ -75,7 +78,6 @@ export class CreateTaskDto {
   @IsString()
   status?: string;
 }
-
 export class UpdateTaskDto extends CreateTaskDto {}
 
 export class TaskResponseDto {

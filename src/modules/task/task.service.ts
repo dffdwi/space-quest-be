@@ -7,6 +7,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Task } from './task.entity';
 import { CreateTaskDto, UpdateTaskDto } from './task.contract';
 import { GameLogicService, GameEventResult } from '../game/game-logic.service';
+import { Project } from '../project/project.entity';
+import { ProjectColumn } from '../project/project_column.entity';
 
 @Injectable()
 export class TaskService {
@@ -35,17 +37,22 @@ export class TaskService {
     return task;
   }
 
-  async create(userId: string, createTaskDto: CreateTaskDto): Promise<Task> {
+  async create(creatorId: string, createTaskDto: CreateTaskDto): Promise<Task> {
     const { dueDate, ...rest } = createTaskDto;
+
     const taskPayload: any = {
       ...rest,
-      userId,
+      userId: createTaskDto.assignedTo || creatorId,
+      createdBy: creatorId,
       type: createTaskDto.projectId ? 'project' : 'personal',
     };
+
     if (dueDate) {
       taskPayload.dueDate = new Date(dueDate);
     }
-    return this.taskModel.create(taskPayload);
+
+    const task = await this.taskModel.create(taskPayload);
+    return task;
   }
 
   async update(
@@ -99,27 +106,47 @@ export class TaskService {
 
   async claimProjectTaskReward(
     taskId: string,
-    userId: string,
+    currentUserId: string,
   ): Promise<{ task: Task; eventResult: GameEventResult }> {
-    const task = await this.findById(taskId, userId);
+    const task = await this.taskModel.findByPk(taskId, {
+      include: [{ model: Project, include: [ProjectColumn] }],
+    });
 
-    if (task.type !== 'project') {
-      throw new BadRequestException('Endpoint ini hanya untuk tugas proyek.');
+    if (!task) {
+      throw new NotFoundException(`Tugas dengan ID ${taskId} tidak ditemukan.`);
     }
-    if (task.status !== 'done') {
-      throw new BadRequestException(
-        'Tugas harus berada di kolom "Done" untuk klaim hadiah.',
-      );
+
+    if (task.type !== 'project' || !task.project) {
+      throw new BadRequestException('Endpoint ini hanya untuk tugas proyek.');
     }
     if (task.isRewardClaimed) {
       throw new BadRequestException('Hadiah untuk tugas ini sudah diklaim.');
+    }
+    if (!task.userId) {
+      throw new BadRequestException('Tugas ini tidak di-assign ke siapa pun.');
+    }
+
+    const doneColumn = task.project.columns.find((col) =>
+      col.title.toLowerCase().includes('done'),
+    );
+
+    if (!doneColumn) {
+      throw new NotFoundException(
+        'Kolom "Done" tidak ditemukan untuk proyek ini.',
+      );
+    }
+
+    if (task.status !== doneColumn.columnId) {
+      throw new BadRequestException(
+        'Tugas harus berada di kolom "Done" untuk klaim hadiah.',
+      );
     }
 
     task.isRewardClaimed = true;
     await task.save();
 
     const eventResult = await this.gameLogicService.processTaskCompletion(
-      userId,
+      task.userId,
       task.xp,
       task.credits,
     );

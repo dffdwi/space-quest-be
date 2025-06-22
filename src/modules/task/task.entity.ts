@@ -26,11 +26,12 @@ export class Task extends Model<Task> {
   @Column({
     type: DataType.UUID,
     allowNull: false,
+    comment: 'The user this task is assigned to (the owner)',
   })
   userId!: string;
 
-  @BelongsTo(() => User)
-  user!: User;
+  @BelongsTo(() => User, 'userId')
+  owner!: User;
 
   @ForeignKey(() => Project)
   @AllowNull(true)
@@ -39,6 +40,17 @@ export class Task extends Model<Task> {
 
   @BelongsTo(() => Project)
   project?: Project;
+
+  @ForeignKey(() => User)
+  @AllowNull(true)
+  @Column({
+    type: DataType.UUID,
+    comment: 'The user who created this task',
+  })
+  createdBy!: string;
+
+  @BelongsTo(() => User, 'createdBy')
+  creator!: User;
 
   @Column(DataType.STRING)
   title!: string;
