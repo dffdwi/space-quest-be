@@ -182,6 +182,7 @@ export class TaskService {
       task.xp,
       task.credits,
       'project',
+      task.projectId,
     );
 
     return { task, eventResult };

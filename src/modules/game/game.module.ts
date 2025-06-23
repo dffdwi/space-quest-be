@@ -11,6 +11,7 @@ import { Mission } from '../mission/mission.entity';
 import { ShopModule } from '../shop/shop.module';
 import { ShopItem } from '../shop/shop_item.entity';
 import { PlayerActivePowerUp } from '../shop/player_active_powerup.entity';
+import { ProjectModule } from '../project/project.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PlayerActivePowerUp } from '../shop/player_active_powerup.entity';
     forwardRef(() => MissionModule),
     forwardRef(() => BadgeModule),
     forwardRef(() => ShopModule),
+    forwardRef(() => ProjectModule),
     SequelizeModule.forFeature([
       Task,
       PlayerMission,

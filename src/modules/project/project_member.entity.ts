@@ -5,6 +5,8 @@ import {
   DataType,
   ForeignKey,
   PrimaryKey,
+  Default,
+  BelongsTo,
 } from 'sequelize-typescript';
 import { User } from '../user/user.entity';
 import { Project } from './project.entity';
@@ -24,6 +26,16 @@ export class ProjectMember extends Model<ProjectMember> {
   @Column(DataType.UUID)
   userId!: string;
 
+  @BelongsTo(() => User)
+  user!: User;
+
   @Column(DataType.STRING)
   role!: string;
+
+  @Default(0)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  projectXp!: number;
 }

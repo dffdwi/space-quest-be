@@ -11,6 +11,7 @@ import { Task } from '../task/task.entity';
 import { PlayerActivePowerUp } from '../shop/player_active_powerup.entity';
 import { ShopItem } from '../shop/shop_item.entity';
 import { PlayerStats } from '../user/player_stats.entity';
+import { ProjectMember } from '../project/project_member.entity';
 
 export const XP_PER_LEVEL = [
   0, 100, 250, 500, 850, 1300, 1850, 2500, 3250, 4100, 5000,
@@ -63,6 +64,8 @@ export class GameLogicService {
     @InjectModel(Badge) private readonly badgeModel: typeof Badge,
     @InjectModel(PlayerActivePowerUp)
     private readonly playerActivePowerUpModel: typeof PlayerActivePowerUp,
+    @InjectModel(ProjectMember)
+    private readonly projectMemberModel: typeof ProjectMember,
     private sequelize: Sequelize,
   ) {}
 
@@ -167,6 +170,7 @@ export class GameLogicService {
     taskXP: number,
     taskCredits: number,
     taskType: 'personal' | 'project',
+    projectId?: string | null,
   ): Promise<GameEventResult> {
     const result: GameEventResult = {
       badgesEarned: [],
@@ -242,6 +246,17 @@ export class GameLogicService {
 
         xpToAdd = cappedXp;
         cpToAdd = cappedCp;
+      } else if (taskType === 'project' && projectId) {
+        // Jika ini tugas proyek, tambahkan XP ke project_members
+        const projectMember = await this.projectMemberModel.findOne({
+          where: { userId, projectId },
+          ...transactionHost,
+        });
+
+        if (projectMember) {
+          projectMember.projectXp += xpToAdd; // Gunakan xpToAdd yang mungkin sudah di-boost
+          await projectMember.save(transactionHost);
+        }
       }
 
       user.xp += xpToAdd;

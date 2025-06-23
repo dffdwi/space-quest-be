@@ -204,4 +204,29 @@ export class ProjectService {
       status: 'PENDING',
     });
   }
+
+  async getProjectLeaderboard(
+    projectId: string,
+    currentUserId: string,
+  ): Promise<ProjectMember[]> {
+    const isMember = await this.projectMemberModel.findOne({
+      where: { projectId, userId: currentUserId },
+    });
+    if (!isMember) {
+      throw new ForbiddenException(
+        'Hanya anggota proyek yang bisa melihat leaderboard.',
+      );
+    }
+
+    return this.projectMemberModel.findAll({
+      where: { projectId },
+      include: [
+        {
+          model: User,
+          attributes: ['userId', 'name', 'avatarUrl', 'level'],
+        },
+      ],
+      order: [['projectXp', 'DESC']],
+    });
+  }
 }

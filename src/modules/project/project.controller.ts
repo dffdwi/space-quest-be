@@ -95,4 +95,16 @@ export class ProjectController {
       req.user.userId,
     );
   }
+
+  @Get(':projectId/leaderboard')
+  @ApiOperation({ summary: 'Mendapatkan leaderboard untuk proyek spesifik' })
+  async getProjectLeaderboard(
+    @Request() req: { user: AuthenticatedUserPayload },
+    @Param('projectId', new ParseUUIDPipe()) projectId: string,
+  ) {
+    return this.projectService.getProjectLeaderboard(
+      projectId,
+      req.user.userId,
+    );
+  }
 }
