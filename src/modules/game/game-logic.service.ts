@@ -176,7 +176,6 @@ export class GameLogicService {
     return await this.sequelize.transaction(async (tx) => {
       const transactionHost = { transaction: tx };
 
-      // 1. Ambil dan kunci user & stats secara terpisah untuk menghindari error
       const user = await this.userModel.findByPk(userId, {
         ...transactionHost,
         lock: tx.LOCK.UPDATE,
@@ -198,7 +197,6 @@ export class GameLogicService {
       let xpToAdd = taskXP;
       let cpToAdd = taskCredits;
 
-      // 2. LOGIKA POWER-UP
       const xpBoostPowerUp = await this.playerActivePowerUpModel.findOne({
         where: { userId },
         include: [
@@ -223,7 +221,6 @@ export class GameLogicService {
         }
       }
 
-      // 3. LOGIKA BATAS HARIAN (HANYA UNTUK TUGAS PERSONAL)
       if (taskType === 'personal') {
         const today = new Date();
         if (!isSameDay(stats.lastPersonalTaskCompletionDate, today)) {
@@ -247,7 +244,6 @@ export class GameLogicService {
         cpToAdd = cappedCp;
       }
 
-      // 4. UPDATE STATISTIK & PENGGUNA
       user.xp += xpToAdd;
       user.credits += cpToAdd;
 
@@ -271,7 +267,6 @@ export class GameLogicService {
       await user.save(transactionHost);
       await stats.save(transactionHost);
 
-      // 5. LOGIKA MISI & LENCANA
       const completedTasksCount = stats.tasksCompleted;
       result.missionsReadyToClaim = await this.updateMissionProgress(
         user,
