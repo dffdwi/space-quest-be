@@ -10,6 +10,7 @@ import { Op } from 'sequelize';
 import { Task } from '../task/task.entity';
 import { PlayerActivePowerUp } from '../shop/player_active_powerup.entity';
 import { ShopItem } from '../shop/shop_item.entity';
+import { PlayerStats } from '../user/player_stats.entity';
 
 export const XP_PER_LEVEL = [
   0, 100, 250, 500, 850, 1300, 1850, 2500, 3250, 4100, 5000,
@@ -33,6 +34,18 @@ const STATIC_MISSION_IDS = {
   COMPLETE_1_TASK: '1af9bca1-7493-4676-b56d-88f28c01608e',
   COMPLETE_5_TASKS: '138af36a-8954-47a4-a171-d6e6b812b8d2',
   REACH_LEVEL_5: '8eea9fb6-ddf2-4d4b-9a4b-b501ab89c243',
+};
+
+const DAILY_PERSONAL_XP_CAP = 20;
+const DAILY_PERSONAL_CP_CAP = 20;
+
+const isSameDay = (date1: Date, date2: Date): boolean => {
+  if (!date1 || !date2) return false;
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
 };
 
 @Injectable()
@@ -153,6 +166,7 @@ export class GameLogicService {
     userId: string,
     taskXP: number,
     taskCredits: number,
+    taskType: 'personal' | 'project',
   ): Promise<GameEventResult> {
     const result: GameEventResult = {
       badgesEarned: [],
@@ -162,15 +176,29 @@ export class GameLogicService {
     return await this.sequelize.transaction(async (tx) => {
       const transactionHost = { transaction: tx };
 
+      // 1. Ambil dan kunci user & stats secara terpisah untuk menghindari error
       const user = await this.userModel.findByPk(userId, {
         ...transactionHost,
         lock: tx.LOCK.UPDATE,
       });
+      if (!user) {
+        throw new Error(`User dengan ID ${userId} tidak ditemukan`);
+      }
 
-      if (!user) throw new Error('User not found');
+      let stats = await PlayerStats.findOne({
+        where: { userId },
+        ...transactionHost,
+        lock: tx.LOCK.UPDATE,
+      });
 
-      let finalXP = taskXP;
+      if (!stats) {
+        stats = await PlayerStats.create({ userId }, transactionHost);
+      }
 
+      let xpToAdd = taskXP;
+      let cpToAdd = taskCredits;
+
+      // 2. LOGIKA POWER-UP
       const xpBoostPowerUp = await this.playerActivePowerUpModel.findOne({
         where: { userId },
         include: [
@@ -183,13 +211,11 @@ export class GameLogicService {
       });
 
       if (xpBoostPowerUp) {
-        finalXP *= 2;
+        xpToAdd *= 2;
         result.powerUpConsumed = { name: xpBoostPowerUp.item.name };
-
         if (xpBoostPowerUp.usesLeft !== null) {
           xpBoostPowerUp.usesLeft -= 1;
         }
-
         if (xpBoostPowerUp.usesLeft !== null && xpBoostPowerUp.usesLeft <= 0) {
           await xpBoostPowerUp.destroy({ transaction: tx });
         } else {
@@ -197,10 +223,39 @@ export class GameLogicService {
         }
       }
 
-      const originalLevel = user.level;
-      user.xp += finalXP;
-      user.credits += taskCredits;
+      // 3. LOGIKA BATAS HARIAN (HANYA UNTUK TUGAS PERSONAL)
+      if (taskType === 'personal') {
+        const today = new Date();
+        if (!isSameDay(stats.lastPersonalTaskCompletionDate, today)) {
+          stats.dailyPersonalXpGained = 0;
+          stats.dailyPersonalCpGained = 0;
+        }
 
+        const remainingXpCap =
+          DAILY_PERSONAL_XP_CAP - stats.dailyPersonalXpGained;
+        const remainingCpCap =
+          DAILY_PERSONAL_CP_CAP - stats.dailyPersonalCpGained;
+
+        const cappedXp = Math.max(0, Math.min(xpToAdd, remainingXpCap));
+        const cappedCp = Math.max(0, Math.min(cpToAdd, remainingCpCap));
+
+        stats.dailyPersonalXpGained += cappedXp;
+        stats.dailyPersonalCpGained += cappedCp;
+        stats.lastPersonalTaskCompletionDate = today;
+
+        xpToAdd = cappedXp;
+        cpToAdd = cappedCp;
+      }
+
+      // 4. UPDATE STATISTIK & PENGGUNA
+      user.xp += xpToAdd;
+      user.credits += cpToAdd;
+
+      stats.tasksCompleted += 1;
+      stats.totalXpEarned += xpToAdd;
+      stats.totalCreditsEarned += cpToAdd;
+
+      const originalLevel = user.level;
       let newLevel = user.level;
       while (
         newLevel < XP_PER_LEVEL.length &&
@@ -214,12 +269,10 @@ export class GameLogicService {
       }
 
       await user.save(transactionHost);
+      await stats.save(transactionHost);
 
-      const completedTasksCount = await this.taskModel.count({
-        where: { userId, completed: true },
-        ...transactionHost,
-      });
-
+      // 5. LOGIKA MISI & LENCANA
+      const completedTasksCount = stats.tasksCompleted;
       result.missionsReadyToClaim = await this.updateMissionProgress(
         user,
         completedTasksCount,

@@ -61,6 +61,26 @@ export class UpdateProfileDto {
   avatarUrl: string;
 }
 
+class PlayerStatsDto {
+  @ApiProperty()
+  tasksCompleted: number;
+
+  @ApiProperty()
+  totalXpEarned: number;
+
+  @ApiProperty()
+  totalCreditsEarned: number;
+
+  @ApiProperty()
+  longestMissionStreak: number;
+
+  @ApiProperty()
+  dailyPersonalXpGained: number;
+
+  @ApiProperty()
+  dailyPersonalCpGained: number;
+}
+
 export class UserResponseDto {
   @ApiProperty({
     example: 'd290f1ee-6c54-4b01-90e6-d701748f0851',
@@ -115,8 +135,8 @@ export class UserResponseDto {
   @IsDateString()
   lastDiscoveryDate?: Date;
 
-  @ApiProperty()
-  stats!: PlayerStats;
+  @ApiProperty({ type: () => PlayerStatsDto })
+  stats: PlayerStatsDto;
 
   @ApiProperty()
   badges?: Badge[];

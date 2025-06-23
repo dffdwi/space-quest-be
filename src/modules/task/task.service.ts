@@ -130,6 +130,7 @@ export class TaskService {
       userId,
       task.xp,
       task.credits,
+      'personal',
     );
 
     return { task, eventResult };
@@ -180,6 +181,7 @@ export class TaskService {
       task.userId,
       task.xp,
       task.credits,
+      'project',
     );
 
     return { task, eventResult };
