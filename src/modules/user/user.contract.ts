@@ -9,6 +9,7 @@ import {
   IsDateString,
   IsUUID,
   IsUrl,
+  Matches,
 } from 'class-validator';
 import { PlayerStats } from './player_stats.entity';
 import { Badge } from '../badge/badge.entity';
@@ -30,6 +31,10 @@ export class CreateUserDto {
   })
   @IsNotEmpty({ message: 'Password tidak boleh kosong' })
   @MinLength(8, { message: 'Password minimal 8 karakter' })
+  @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
+    message:
+      'Password terlalu lemah. Gunakan kombinasi huruf besar, huruf kecil, dan angka/simbol.',
+  })
   password!: string;
 
   @ApiPropertyOptional({
@@ -169,4 +174,35 @@ export class UserResponseDto {
     this.pendingInvitationCount = user.receivedInvitations?.length || 0;
     this.activePowerUps = user.activePowerUps;
   }
+}
+
+export class ChangePasswordDto {
+  @ApiProperty({
+    description: 'Password saat ini',
+    example: 'P@sswOrd123',
+  })
+  @IsString()
+  @IsNotEmpty()
+  currentPassword!: string;
+
+  @ApiProperty({
+    description:
+      'Password baru (minimal 8 karakter, mengandung huruf besar, huruf kecil, dan angka)',
+    example: 'NewP@ssw0rd!',
+  })
+  @IsString()
+  @MinLength(8, { message: 'Password baru minimal 8 karakter' })
+  @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
+    message:
+      'Password baru terlalu lemah. Gunakan kombinasi huruf besar, huruf kecil, dan angka/simbol.',
+  })
+  newPassword!: string;
+
+  @ApiProperty({
+    description: 'Konfirmasi password baru',
+    example: 'NewP@ssw0rd!',
+  })
+  @IsString()
+  @IsNotEmpty()
+  confirmPassword!: string;
 }

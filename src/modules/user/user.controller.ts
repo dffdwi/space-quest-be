@@ -7,10 +7,13 @@ import {
   Query,
   Request,
   Put,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
   ApplyFrameDto,
+  ChangePasswordDto,
   CreateUserDto,
   UpdateProfileDto,
 } from './user.contract';
@@ -106,5 +109,22 @@ export class UserController {
       updateProfileDto.avatarUrl,
     );
     return new UserResponseDto(user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Put('profile/change-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Mengubah password pengguna' })
+  @ApiResponse({ status: 204, description: 'Password berhasil diubah.' })
+  @ApiResponse({
+    status: 400,
+    description: 'Data tidak valid atau password saat ini salah.',
+  })
+  async changePassword(
+    @Request() req: { user: AuthenticatedUserPayload },
+    @Body() changePasswordDto: ChangePasswordDto,
+  ): Promise<void> {
+    await this.userService.changePassword(req.user.userId, changePasswordDto);
   }
 }

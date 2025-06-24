@@ -2,9 +2,10 @@ import {
   Injectable,
   ConflictException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { CreateUserDto } from './user.contract';
+import { ChangePasswordDto, CreateUserDto } from './user.contract';
 import { User } from './user.entity';
 import { PlayerStats } from './player_stats.entity';
 import { Op, Sequelize } from 'sequelize';
@@ -167,5 +168,31 @@ export class UserService {
     user.avatarUrl = avatarUrl;
     await user.save();
     return user;
+  }
+
+  async changePassword(
+    userId: string,
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<void> {
+    const { currentPassword, newPassword, confirmPassword } = changePasswordDto;
+
+    if (newPassword !== confirmPassword) {
+      throw new BadRequestException(
+        'Password baru dan konfirmasi password tidak cocok.',
+      );
+    }
+
+    const user = await this.userModel.findByPk(userId);
+    if (!user) {
+      throw new NotFoundException('Pengguna tidak ditemukan.');
+    }
+
+    const isPasswordMatch = await user.comparePassword(currentPassword);
+    if (!isPasswordMatch) {
+      throw new BadRequestException('Password saat ini salah.');
+    }
+
+    user.password = newPassword;
+    await user.save();
   }
 }

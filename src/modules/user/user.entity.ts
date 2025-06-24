@@ -9,6 +9,7 @@ import {
   HasMany,
   BelongsToMany,
   HasOne,
+  BeforeUpdate,
 } from 'sequelize-typescript';
 import * as bcrypt from 'bcrypt';
 import { Task } from '../task/task.entity';
@@ -132,10 +133,13 @@ export class User extends Model<User> {
   activePowerUps!: PlayerActivePowerUp[];
 
   @BeforeCreate
+  @BeforeUpdate
   static async hashPassword(instance: User) {
-    if (instance.password) {
-      const salt = await bcrypt.genSalt(10);
-      instance.password = await bcrypt.hash(instance.password, salt);
+    if (instance.changed('password')) {
+      if (instance.password) {
+        const saltRounds = 10;
+        instance.password = await bcrypt.hash(instance.password, saltRounds);
+      }
     }
   }
 
