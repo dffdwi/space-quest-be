@@ -61,7 +61,7 @@ export class UpdateProfileDto {
   @IsString()
   name: string;
 
-  @IsUrl()
+  // @IsUrl()
   @IsOptional()
   avatarUrl: string;
 }

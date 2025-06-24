@@ -38,7 +38,14 @@ export class ShopItem extends Model<ShopItem> {
   icon?: string;
 
   @AllowNull(true)
-  @Column(DataType.ENUM('Ship Customization', 'Commander Gear', 'Consumables'))
+  @Column(
+    DataType.ENUM(
+      'Ship Customization',
+      'Commander Gear',
+      'Consumables',
+      'Avatars',
+    ),
+  )
   category?: string;
 
   @AllowNull(true)
