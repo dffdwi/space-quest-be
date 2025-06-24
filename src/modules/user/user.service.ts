@@ -31,7 +31,10 @@ export class UserService {
     if (existingUser) {
       throw new ConflictException('Email sudah terdaftar');
     }
-    const user = await this.userModel.create({ ...createUserDto });
+    const user = await this.userModel.create({
+      ...createUserDto,
+      avatarUrl: '/images/char-1.svg',
+    });
     await PlayerStats.create({ userId: user.userId });
     return user;
   }
