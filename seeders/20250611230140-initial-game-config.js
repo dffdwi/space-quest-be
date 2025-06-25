@@ -16,6 +16,7 @@ module.exports = {
       COMPLETE_1_TASK: '1af9bca1-7493-4676-b56d-88f28c01608e',
       COMPLETE_5_TASKS: '138af36a-8954-47a4-a171-d6e6b812b8d2',
       REACH_LEVEL_5: '8eea9fb6-ddf2-4d4b-9a4b-b501ab89c243',
+      COMPLETE_20_TASKS: '22ad6498-c049-4820-90d7-846abf585c5f',
     };
 
     await queryInterface.bulkInsert('badges', [
@@ -91,6 +92,19 @@ module.exports = {
         rewardXp: 200,
         rewardCredits: 100,
         rewardBadgeId: badgeIds.LEVEL_5_CADET,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        missionId: missionIds.COMPLETE_20_TASKS,
+        title: 'Veteran Commander',
+        description:
+          'Complete a total of 20 objectives and prove your dedication.',
+        type: 'once',
+        target: 20,
+        rewardXp: 200,
+        rewardCredits: 75,
+        rewardBadgeId: badgeIds.DILIGENT_COMMANDER,
         createdAt: new Date(),
         updatedAt: new Date(),
       },

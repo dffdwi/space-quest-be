@@ -35,6 +35,7 @@ const STATIC_MISSION_IDS = {
   COMPLETE_1_TASK: '1af9bca1-7493-4676-b56d-88f28c01608e',
   COMPLETE_5_TASKS: '138af36a-8954-47a4-a171-d6e6b812b8d2',
   REACH_LEVEL_5: '8eea9fb6-ddf2-4d4b-9a4b-b501ab89c243',
+  COMPLETE_20_TASKS: '22ad6498-c049-4820-90d7-846abf585c5f',
 };
 
 const DAILY_PERSONAL_XP_CAP = 20;
@@ -161,6 +162,10 @@ export class GameLogicService {
       completedTasksCount,
     );
     await checkAndUpdate(STATIC_MISSION_IDS.REACH_LEVEL_5, user.level);
+    await checkAndUpdate(
+      STATIC_MISSION_IDS.COMPLETE_20_TASKS,
+      completedTasksCount,
+    );
 
     return missionsReady;
   }
