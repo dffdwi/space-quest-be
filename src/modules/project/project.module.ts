@@ -3,10 +3,10 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Project } from './project.entity';
 import { ProjectColumn } from './project_column.entity';
 import { ProjectMember } from './project_member.entity';
+import { ProjectInvitation } from './project_invitation.entity';
 import { ProjectService } from './project.service';
 import { ProjectController } from './project.controller';
 import { UserModule } from '../user/user.module';
-import { ProjectInvitation } from './project_invitation.entity';
 
 @Module({
   imports: [
@@ -20,6 +20,6 @@ import { ProjectInvitation } from './project_invitation.entity';
   ],
   providers: [ProjectService],
   controllers: [ProjectController],
-  exports: [SequelizeModule],
+  exports: [SequelizeModule, ProjectService],
 })
 export class ProjectModule {}
