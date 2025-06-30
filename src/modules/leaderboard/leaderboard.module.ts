@@ -8,5 +8,6 @@ import { BadgeModule } from '../badge/badge.module';
   imports: [forwardRef(() => UserModule), BadgeModule],
   providers: [LeaderboardService],
   controllers: [LeaderboardController],
+  exports: [LeaderboardService],
 })
 export class LeaderboardModule {}

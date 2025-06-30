@@ -6,7 +6,8 @@ import { ShopService } from './shop.service';
 import { ShopController } from './shop.controller';
 import { UserModule } from '../user/user.module';
 import { PlayerActivePowerUp } from './player_active_powerup.entity';
-
+import { BadgeModule } from '../badge/badge.module';
+  
 @Module({
   imports: [
     SequelizeModule.forFeature([
@@ -15,6 +16,7 @@ import { PlayerActivePowerUp } from './player_active_powerup.entity';
       PlayerActivePowerUp,
     ]),
     forwardRef(() => UserModule),
+    forwardRef(() => BadgeModule),
   ],
   providers: [ShopService],
   controllers: [ShopController],

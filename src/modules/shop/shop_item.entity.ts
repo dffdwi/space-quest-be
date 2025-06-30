@@ -6,7 +6,10 @@ import {
   PrimaryKey,
   Default,
   AllowNull,
+  ForeignKey,
+  BelongsTo,
 } from 'sequelize-typescript';
+import { Badge } from '../badge/badge.entity';
 
 @Table({
   tableName: 'shop_items',
@@ -24,10 +27,13 @@ export class ShopItem extends Model<ShopItem> {
   @Column(DataType.TEXT)
   description!: string;
 
+  @Default(0)
   @Column(DataType.INTEGER)
   price!: number;
 
-  @Column(DataType.ENUM('theme', 'avatar_frame', 'power_up', 'cosmetic'))
+  @Column(
+    DataType.ENUM('theme', 'avatar_frame', 'power_up', 'cosmetic', 'voucher'),
+  )
   type!: string;
 
   @Column(DataType.STRING)
@@ -44,6 +50,7 @@ export class ShopItem extends Model<ShopItem> {
       'Commander Gear',
       'Consumables',
       'Avatars',
+      'Vouchers',
     ),
   )
   category?: string;
@@ -51,4 +58,12 @@ export class ShopItem extends Model<ShopItem> {
   @AllowNull(true)
   @Column(DataType.INTEGER)
   duration?: number;
+
+  @ForeignKey(() => Badge)
+  @AllowNull(true)
+  @Column(DataType.UUID)
+  requiredBadgeId?: string;
+
+  @BelongsTo(() => Badge)
+  requiredBadge?: Badge;
 }

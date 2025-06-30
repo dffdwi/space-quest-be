@@ -10,6 +10,9 @@ module.exports = {
       EXPLORER_INITIATE: 'aff831c5-37f1-47cd-be47-0c38cc4c6893',
       DILIGENT_COMMANDER: '5b6e40ce-1d8a-4b2f-a525-6a3b7966be38',
       LEVEL_5_CADET: '9bca3149-b4c6-457b-8d17-41299dbf1a63',
+      RANK_1_GOLD: '6b851a93-2ee7-4387-b967-422059e0f1aa',
+      RANK_2_SILVER: '5316b2ff-2b7a-402b-9918-d1d6c6890e1c',
+      RANK_3_BRONZE: '9f30ea3c-63c4-4fe8-b541-a19933a71fd8',
     };
 
     const missionIds = {
@@ -17,6 +20,23 @@ module.exports = {
       COMPLETE_5_TASKS: '138af36a-8954-47a4-a171-d6e6b812b8d2',
       REACH_LEVEL_5: '8eea9fb6-ddf2-4d4b-9a4b-b501ab89c243',
       COMPLETE_20_TASKS: '22ad6498-c049-4820-90d7-846abf585c5f',
+    };
+
+    const shop_items = {
+      NEBULA_DARK_THEME: 'f6f6ea62-f637-424f-ab08-f853c2403e03',
+      GOLD_COMMANDER_FRAME: 'a3a22bfc-55f5-4611-9d7f-0f4644977563',
+      XP_HYPER_BOOST_SMALL: '702c250e-182c-4af3-86da-e002a18946e6',
+      STARFIELD_LIGHT_THEME: 'b79ddf25-092b-4cd4-a18b-b7b84fcb38be',
+      AVATAR_BALLOON: '0bb2d41e-8e96-4a3b-8bd3-8b6a6f48825a',
+      AVATAR_WORKER: '402b237f-fa68-4d45-a69b-40d64f8108b8',
+      AVATAR_KARATE: 'bce0e175-ef34-497d-8783-2f8c9d562afe',
+      AVATAR_SWIMMER: '8f265009-5900-4156-ba6b-10f39b491631',
+      AVATAR_HOTDOG: '5920c52d-743d-401b-b1e3-5722ab68fac7',
+      AVATAR_PIRATE: 'e9c8f8d1-e8c5-4de6-a997-a48d65c632f9',
+      AVATAR_MONKEY: '78ae7d2b-e244-4843-b5bd-a44c127ab106',
+      VOUCHER_50K: '895cde32-ea73-4c5f-83c9-2cbf42617e59',
+      VOUCHER_30K: '81c1d5ad-0850-4525-b40c-38c77c00f663',
+      VOUCHER_20K: '051a9685-12b5-450d-9a73-9abc60a5904f',
     };
 
     await queryInterface.bulkInsert('badges', [
@@ -53,6 +73,33 @@ module.exports = {
         description: 'Reach Command Level 5.',
         icon: 'FaGraduationCap',
         color: 'text-indigo-400',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        badgeId: badgeIds.RANK_1_GOLD,
+        name: 'Galactic Champion (Rank 1)',
+        description: 'Achieved the #1 position on the Hall of Fame.',
+        icon: 'FaCrown',
+        color: 'text-amber-400',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        badgeId: badgeIds.RANK_2_SILVER,
+        name: 'Elite Commander (Rank 2)',
+        description: 'Achieved the #2 position on the Hall of Fame.',
+        icon: 'FaMedal',
+        color: 'text-slate-300',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        badgeId: badgeIds.RANK_3_BRONZE,
+        name: 'Distinguished Captain (Rank 3)',
+        description: 'Achieved the #3 position on the Hall of Fame.',
+        icon: 'FaMedal',
+        color: 'text-yellow-600',
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -112,7 +159,7 @@ module.exports = {
 
     await queryInterface.bulkInsert('shop_items', [
       {
-        itemId: uuidv4(),
+        itemId: shop_items.NEBULA_DARK_THEME,
         name: 'Nebula Dark Theme',
         description: 'A sleek, dark interface with vibrant nebula accents.',
         price: 250,
@@ -125,7 +172,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        itemId: uuidv4(),
+        itemId: shop_items.GOLD_COMMANDER_FRAME,
         name: 'Gold Commander Frame',
         description: 'A prestigious gold frame for your commander avatar.',
         price: 150,
@@ -138,7 +185,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        itemId: uuidv4(),
+        itemId: shop_items.XP_HYPER_BOOST_SMALL,
         name: 'XP Hyper-Boost (Small)',
         description: 'Doubles XP gained from the next 3 completed objectives.',
         price: 75,
@@ -151,7 +198,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        itemId: uuidv4(),
+        itemId: shop_items.STARFIELD_LIGHT_THEME,
         name: 'Starfield Light Theme',
         description:
           'A bright and clear interface, like gazing upon a field of distant stars.',
@@ -165,7 +212,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        itemId: uuidv4(),
+        itemId: shop_items.AVATAR_BALLOON,
         name: 'Avatar: The Balloon',
         description:
           'A light and cheerful presence, ready to float to new heights.',
@@ -179,7 +226,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        itemId: uuidv4(),
+        itemId: shop_items.AVATAR_WORKER,
         name: 'Avatar: The Worker',
         description:
           'A diligent and hardworking commander, always ready for duty.',
@@ -193,7 +240,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        itemId: uuidv4(),
+        itemId: shop_items.AVATAR_KARATE,
         name: 'Avatar: The Karate',
         description:
           'A disciplined commander with swift and precise execution.',
@@ -207,7 +254,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        itemId: uuidv4(),
+        itemId: shop_items.AVATAR_SWIMMER,
         name: 'Avatar: The Swimmer',
         description:
           'A commander who navigates challenges with grace and fluidity.',
@@ -221,7 +268,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        itemId: uuidv4(),
+        itemId: shop_items.AVATAR_HOTDOG,
         name: 'Avatar: The Hotdog',
         description:
           'A fun-loving commander who brings the party to every mission.',
@@ -235,7 +282,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        itemId: uuidv4(),
+        itemId: shop_items.AVATAR_PIRATE,
         name: 'Avatar: The Pirate',
         description:
           'A bold adventurer, seeking treasure and glory across the cosmos.',
@@ -249,7 +296,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        itemId: uuidv4(),
+        itemId: shop_items.AVATAR_MONKEY,
         name: 'Avatar: The Monkey',
         description: 'An agile and resourceful commander, speed and precision',
         price: 75,
@@ -258,6 +305,48 @@ module.exports = {
         icon: '/images/char-8.svg',
         category: 'Avatars',
         duration: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        itemId: shop_items.VOUCHER_50K,
+        name: 'Voucher Rp.50.000',
+        description: 'Redeem this voucher by exchanging your Rank 1 Badge.',
+        price: 0,
+        type: 'voucher',
+        value: 'VOUCHER_50K',
+        icon: 'FaGift',
+        category: 'Vouchers',
+        duration: null,
+        requiredBadgeId: badgeIds.RANK_1_GOLD,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        itemId: shop_items.VOUCHER_30K,
+        name: 'Voucher Rp.30.000',
+        description: 'Redeem this voucher by exchanging your Rank 2 Badge.',
+        price: 0,
+        type: 'voucher',
+        value: 'VOUCHER_30K',
+        icon: 'FaGift',
+        category: 'Vouchers',
+        duration: null,
+        requiredBadgeId: badgeIds.RANK_2_SILVER,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        itemId: shop_items.VOUCHER_20K,
+        name: 'Voucher Rp.20.000',
+        description: 'Redeem this voucher by exchanging your Rank 3 Badge.',
+        price: 0,
+        type: 'voucher',
+        value: 'VOUCHER_20K',
+        icon: 'FaGift',
+        category: 'Vouchers',
+        duration: null,
+        requiredBadgeId: badgeIds.RANK_3_BRONZE,
         createdAt: new Date(),
         updatedAt: new Date(),
       },

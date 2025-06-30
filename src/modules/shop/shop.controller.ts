@@ -35,4 +35,15 @@ export class ShopController {
       purchaseItemDto.itemId,
     );
   }
+  @Post('redeem-voucher')
+  @ApiOperation({ summary: 'Menukarkan lencana peringkat dengan voucher' })
+  async redeemVoucher(
+    @Request() req: { user: AuthenticatedUserPayload },
+    @Body() purchaseItemDto: PurchaseItemDto,
+  ) {
+    return this.shopService.redeemVoucher(
+      req.user.userId,
+      purchaseItemDto.itemId,
+    );
+  }
 }
